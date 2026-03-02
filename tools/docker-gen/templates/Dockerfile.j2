@@ -4,7 +4,7 @@ FROM rust:1.88-bookworm AS chef
 WORKDIR /services
 
 # Install cargo-chef
-RUN cargo install --git https://github.com/preiter93/cargo-chef --branch reduce-workspace
+RUN cargo install --git https://github.com/preiter93/cargo-chef --branch workspace-filtering
 
 # Prepare dependency recipe
 FROM chef AS planner
