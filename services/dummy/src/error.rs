@@ -1,7 +1,6 @@
 use derive_tonic_status::Status;
 use thiserror::Error;
 
-/// Error for [`crate::proto::api_service_server::ApiService::create_entity`]
 #[derive(Debug, Error, Status)]
 #[non_exhaustive]
 pub enum Error {
@@ -20,6 +19,10 @@ pub enum Error {
     #[error("get entity error: {0}")]
     #[status(Internal)]
     GetEntity(DBError),
+
+    #[error("insert entity error: {0}")]
+    #[status(Internal)]
+    InsertEntity(DBError),
 }
 
 // Database error

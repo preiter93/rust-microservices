@@ -8,6 +8,14 @@
 
 export const protobufPackage = "dummy";
 
+export interface CreateEntityReq {
+  userId: string;
+}
+
+export interface CreateEntityResp {
+  entity?: Entity | undefined;
+}
+
 export interface GetEntityReq {
   id: string;
   userId: string;
@@ -20,6 +28,68 @@ export interface GetEntityResp {
 export interface Entity {
   id: string;
 }
+
+function createBaseCreateEntityReq(): CreateEntityReq {
+  return { userId: "" };
+}
+
+export const CreateEntityReq: MessageFns<CreateEntityReq> = {
+  fromJSON(object: any): CreateEntityReq {
+    return {
+      userId: isSet(object.userId)
+        ? globalThis.String(object.userId)
+        : isSet(object.user_id)
+        ? globalThis.String(object.user_id)
+        : "",
+    };
+  },
+
+  toJSON(message: CreateEntityReq): unknown {
+    const obj: any = {};
+    if (message.userId !== "") {
+      obj.userId = message.userId;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<CreateEntityReq>, I>>(base?: I): CreateEntityReq {
+    return CreateEntityReq.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<CreateEntityReq>, I>>(object: I): CreateEntityReq {
+    const message = createBaseCreateEntityReq();
+    message.userId = object.userId ?? "";
+    return message;
+  },
+};
+
+function createBaseCreateEntityResp(): CreateEntityResp {
+  return { entity: undefined };
+}
+
+export const CreateEntityResp: MessageFns<CreateEntityResp> = {
+  fromJSON(object: any): CreateEntityResp {
+    return { entity: isSet(object.entity) ? Entity.fromJSON(object.entity) : undefined };
+  },
+
+  toJSON(message: CreateEntityResp): unknown {
+    const obj: any = {};
+    if (message.entity !== undefined) {
+      obj.entity = Entity.toJSON(message.entity);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<CreateEntityResp>, I>>(base?: I): CreateEntityResp {
+    return CreateEntityResp.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<CreateEntityResp>, I>>(object: I): CreateEntityResp {
+    const message = createBaseCreateEntityResp();
+    message.entity = (object.entity !== undefined && object.entity !== null)
+      ? Entity.fromPartial(object.entity)
+      : undefined;
+    return message;
+  },
+};
 
 function createBaseGetEntityReq(): GetEntityReq {
   return { id: "", userId: "" };

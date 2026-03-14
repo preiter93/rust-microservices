@@ -14,8 +14,8 @@ where
     /// Deletes a session.
     ///
     /// # Errors
-    /// - token is malformed
-    /// - database error
+    /// - `InvalidArgument` if the token is missing or malformed
+    /// - `Internal` if the session cannot be deleted from the db
     ///
     /// # Further readings
     /// <https://lucia-auth.com/sessions/basic>

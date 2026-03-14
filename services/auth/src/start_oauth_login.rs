@@ -14,7 +14,8 @@ where
     /// Starts a oauth login.
     ///
     /// # Errors
-    /// - generating authorization url
+    /// - `InvalidArgument` if the oauth provider is unspecified
+    /// - `Internal` if generating authorization url fails
     pub async fn start_oauth_login(
         &self,
         req: Request<StartOauthLoginReq>,

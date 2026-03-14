@@ -18,7 +18,9 @@ where
     /// Gets an entity by identifier.
     ///
     /// # Errors
-    /// - ?
+    /// - `InvalidArgument` if the entity id is empty or invalid
+    /// - `NotFound` if the entity is not found
+    /// - `Internal` if the database query fails
     pub async fn get_entity(
         &self,
         req: Request<GetEntityReq>,

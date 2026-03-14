@@ -1,3 +1,4 @@
+pub mod create_entity;
 pub mod db;
 pub mod error;
 pub mod get_entity;

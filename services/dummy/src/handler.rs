@@ -1,6 +1,9 @@
 use crate::{
     db::DBClient,
-    proto::{GetEntityReq, GetEntityResp, dummy_service_server::DummyService},
+    proto::{
+        CreateEntityReq, CreateEntityResp, GetEntityReq, GetEntityResp,
+        dummy_service_server::DummyService,
+    },
 };
 use common::UuidGenerator;
 use tonic::{Request, Response, Status};
@@ -19,6 +22,14 @@ where
     D: DBClient,
     U: UuidGenerator,
 {
+    #[instrument(skip_all, fields(user_id), err)]
+    async fn create_entity(
+        &self,
+        req: Request<CreateEntityReq>,
+    ) -> Result<Response<CreateEntityResp>, Status> {
+        self.create_entity(req).await
+    }
+
     #[instrument(skip_all, fields(user_id), err)]
     async fn get_entity(
         &self,

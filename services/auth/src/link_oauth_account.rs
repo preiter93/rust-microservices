@@ -18,9 +18,8 @@ where
     /// Links a user_id to an oauth token.
     ///
     /// # Errors
-    /// - missing oauth token id
-    /// - missing user id
-    /// - updating oauth token (db)
+    /// - `InvalidArgument` if the oauth account id or user id is missing or invalid
+    /// - `Internal` if updating the oauth account fails
     pub async fn link_oauth_account(
         &self,
         req: Request<LinkOauthAccountReq>,

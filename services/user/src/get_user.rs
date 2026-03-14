@@ -16,7 +16,9 @@ where
     /// Gets a user by identifier.
     ///
     /// # Errors
-    /// - internal error if the user cannot be inserted into the db
+    /// - `InvalidArgument` if the user id is empty or invalid
+    /// - `NotFound` if the user is not found
+    /// - `Internal` if the database query fails
     pub async fn get_user(
         &self,
         req: Request<GetUserReq>,

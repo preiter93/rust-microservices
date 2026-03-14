@@ -19,7 +19,8 @@ where
     /// Creates a new session.
     ///
     /// # Errors
-    /// - database error
+    /// - `InvalidArgument` if the user id is empty or invalid
+    /// - `Internal` if the session cannot be inserted into the db
     ///
     /// # Further readings
     /// <https://lucia-auth.com/sessions/basic>

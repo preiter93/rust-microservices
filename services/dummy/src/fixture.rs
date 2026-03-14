@@ -2,7 +2,7 @@
 
 use uuid::Uuid;
 
-use crate::proto::{Entity, GetEntityReq, GetEntityResp};
+use crate::proto::{CreateEntityReq, Entity, GetEntityReq, GetEntityResp};
 
 pub fn fixture_uuid() -> Uuid {
     Uuid::parse_str("00000000-0000-0000-0000-000000000000").unwrap()
@@ -29,6 +29,17 @@ where
     };
     func(&mut entity);
     entity
+}
+
+pub fn fixture_create_entity_req<F>(mut func: F) -> CreateEntityReq
+where
+    F: FnMut(&mut CreateEntityReq),
+{
+    let mut req = CreateEntityReq {
+        user_id: fixture_uuid().to_string(),
+    };
+    func(&mut req);
+    req
 }
 
 pub fn fixture_entity<F>(mut func: F) -> Entity

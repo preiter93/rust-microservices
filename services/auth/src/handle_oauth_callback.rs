@@ -18,9 +18,8 @@ where
     /// Handles a oauth login callback
     ///
     /// # Errors
-    /// - validating authorization code
-    /// - decoding the id token
-    /// - upserting oauth token (db)
+    /// - `InvalidArgument` if the oauth provider is unspecified
+    /// - `Internal` if validating authorization code, decoding id token, or upserting oauth account fails
     pub async fn handle_oauth_callback(
         &self,
         req: Request<HandleOauthCallbackReq>,

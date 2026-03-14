@@ -2,7 +2,16 @@ syntax = "proto3";
 package dummy;
 
 service DummyService {
+    rpc CreateEntity(CreateEntityReq) returns (CreateEntityResp) {}
     rpc GetEntity(GetEntityReq) returns (GetEntityResp) {}
+}
+
+message CreateEntityReq {
+    string user_id = 1;
+}
+
+message CreateEntityResp {
+    Entity entity = 1;
 }
 
 message GetEntityReq {

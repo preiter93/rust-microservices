@@ -28,10 +28,9 @@ where
     /// the expiration and comparing the secret against the hash.
     ///
     /// # Errors
-    /// - token is malformed
-    /// - session is expired
-    /// - session secret is invalid
-    /// - database error
+    /// - `InvalidArgument` if the token is missing or malformed
+    /// - `Unauthenticated` if the session is expired or secret is invalid
+    /// - `Internal` if the database query fails
     ///
     /// # Further readings
     /// <https://lucia-auth.com/sessions/basic>

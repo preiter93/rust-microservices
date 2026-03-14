@@ -1,6 +1,8 @@
 // This file is generated.
 use crate::GRPC_PORT;
 use crate::SERVICE_NAME;
+use crate::proto::CreateEntityReq;
+use crate::proto::CreateEntityResp;
 use crate::proto::GetEntityReq;
 use crate::proto::GetEntityResp;
 use crate::proto::dummy_service_client::DummyServiceClient;
@@ -27,12 +29,16 @@ impl DummyClient {
 #[rustfmt::skip]
 #[async_trait]
 pub trait IDummyClient: Send + Sync + 'static {
+    async fn create_entity(&self, req: Request<CreateEntityReq>) -> Result<Response<CreateEntityResp>, Status>;
     async fn get_entity(&self, req: Request<GetEntityReq>) -> Result<Response<GetEntityResp>, Status>;
 }
 
 #[rustfmt::skip]
 #[async_trait]
 impl IDummyClient for DummyClient {
+    async fn create_entity(&self, req: Request<CreateEntityReq>) -> Result<Response<CreateEntityResp>, Status> {
+        self.0.clone().create_entity(req).await
+    }
     async fn get_entity(&self, req: Request<GetEntityReq>) -> Result<Response<GetEntityResp>, Status> {
         self.0.clone().get_entity(req).await
     }
@@ -46,6 +52,8 @@ pub mod testutils {
 
     #[rustfmt::skip]
     pub struct MockDummyClient {
+        pub create_entity_req: Mutex<Option<CreateEntityReq>>,
+        pub create_entity_resp: Mutex<Option<Result<CreateEntityResp, Status>>>,
         pub get_entity_req: Mutex<Option<GetEntityReq>>,
         pub get_entity_resp: Mutex<Option<Result<GetEntityResp, Status>>>,
     }
@@ -53,6 +61,8 @@ pub mod testutils {
     impl Default for MockDummyClient {
         fn default() -> Self {
             Self {
+                create_entity_req: Mutex::new(None),
+                create_entity_resp: Mutex::new(None),
                 get_entity_req: Mutex::new(None),
                 get_entity_resp: Mutex::new(None),
             }
@@ -62,6 +72,10 @@ pub mod testutils {
     #[rustfmt::skip]
     #[async_trait]
     impl IDummyClient for MockDummyClient {
+        async fn create_entity(&self, req: Request<CreateEntityReq>) -> Result<Response<CreateEntityResp>, Status> {
+            *self.create_entity_req.lock().await = Some(req.into_inner());
+            self.create_entity_resp.lock().await.take().unwrap().map(Response::new)
+        }
         async fn get_entity(&self, req: Request<GetEntityReq>) -> Result<Response<GetEntityResp>, Status> {
             *self.get_entity_req.lock().await = Some(req.into_inner());
             self.get_entity_resp.lock().await.take().unwrap().map(Response::new)

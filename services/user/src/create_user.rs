@@ -15,7 +15,8 @@ where
     /// Creates a new user.
     ///
     /// # Errors
-    /// - internal error if the user cannot be inserted into the db
+    /// - `InvalidArgument` if the user name or email is empty
+    /// - `Internal` if the user cannot be inserted into the db
     pub async fn create_user(
         &self,
         req: Request<CreateUserReq>,
