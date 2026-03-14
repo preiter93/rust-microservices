@@ -1,43 +1,36 @@
+use derive_tonic_status::Status;
 use thiserror::Error;
-use tonic::{Code, Status};
 
-#[derive(Debug, thiserror::Error)]
+#[derive(Debug, Error, Status)]
 #[non_exhaustive]
 pub enum Error {
     #[error("missing user id")]
+    #[status(InvalidArgument)]
     MissingUserId,
 
     #[error("invalid user id: {0}")]
+    #[status(InvalidArgument)]
     InvalidUserId(String),
 
     #[error("missing user name")]
+    #[status(InvalidArgument)]
     MissingUserName,
 
     #[error("missing user email")]
+    #[status(InvalidArgument)]
     MissingUserEmail,
 
     #[error("user not found: {0}")]
+    #[status(NotFound)]
     UserNotFound(String),
 
     #[error("get user error: {0}")]
+    #[status(Internal)]
     GetUser(DBError),
 
     #[error("insert user error: {0}")]
+    #[status(Internal)]
     InsertUser(DBError),
-}
-
-impl From<Error> for Status {
-    fn from(err: Error) -> Self {
-        let code = match err {
-            Error::MissingUserName
-            | Error::MissingUserEmail
-            | Error::MissingUserId
-            | Error::InvalidUserId(_) => Code::InvalidArgument,
-            Error::UserNotFound(_) => Code::NotFound,
-            Error::GetUser(_) | Error::InsertUser(_) => Code::Internal,
-        };
-        Status::new(code, err.to_string())
-    }
 }
 
 // Database error

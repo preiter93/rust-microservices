@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 chrono = { workspace = true }
 deadpool-postgres = { workspace = true }
+derive-tonic-status = { workspace = true }
 dotenv = { workspace = true }
 prost = { workspace = true }
 refinery = { workspace = true }

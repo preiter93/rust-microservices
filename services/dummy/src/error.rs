@@ -1,33 +1,25 @@
+use derive_tonic_status::Status;
 use thiserror::Error;
-use tonic::Code;
-use tonic::Status;
 
 /// Error for [`crate::proto::api_service_server::ApiService::create_entity`]
-#[derive(Debug, thiserror::Error)]
+#[derive(Debug, Error, Status)]
 #[non_exhaustive]
 pub enum Error {
     #[error("missing entity id")]
+    #[status(InvalidArgument)]
     MissingEntityId,
 
     #[error("invalid entity id: {0}")]
+    #[status(InvalidArgument)]
     InvalidEntityId(String),
 
     #[error("entity not found: {0}")]
+    #[status(NotFound)]
     EntityNotFound(String),
 
     #[error("get entity error: {0}")]
+    #[status(Internal)]
     GetEntity(DBError),
-}
-
-impl From<Error> for Status {
-    fn from(err: Error) -> Self {
-        let code = match err {
-            Error::MissingEntityId | Error::InvalidEntityId(_) => Code::InvalidArgument,
-            Error::EntityNotFound(_) => Code::NotFound,
-            Error::GetEntity(_) => Code::Internal,
-        };
-        Status::new(code, err.to_string())
-    }
 }
 
 // Database error

@@ -89,6 +89,7 @@ dependencies = [
  "common",
  "database",
  "deadpool-postgres",
+ "derive-tonic-status",
  "dotenv",
  "mock",
  "oauth",
@@ -468,6 +469,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "derive-tonic-status"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "eddddfe3d2311947633490ee4cf713be918195edca3e8821dfa79c973e163cb6"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "digest"
 version = "0.10.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -529,6 +541,7 @@ dependencies = [
  "common",
  "database",
  "deadpool-postgres",
+ "derive-tonic-status",
  "dotenv",
  "mock",
  "prost 0.14.3",
@@ -3244,6 +3257,7 @@ dependencies = [
  "common",
  "database",
  "deadpool-postgres",
+ "derive-tonic-status",
  "dotenv",
  "mock",
  "prost 0.14.3",
