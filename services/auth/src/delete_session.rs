@@ -14,7 +14,7 @@ where
     /// Deletes a session.
     ///
     /// # Errors
-    /// - `InvalidArgument` if the token is missing or malformed
+    /// - `Unauthenticated` if the token is missing or malformed
     /// - `Internal` if the session cannot be deleted from the db
     ///
     /// # Further readings
@@ -78,14 +78,14 @@ mod tests {
             token: String::new(),
         },
         Ok(()),
-        Err(Code::InvalidArgument)
+        Err(Code::Unauthenticated)
     )]
     #[case::invalid_format(
         DeleteSessionReq {
             token: "invalid-format".to_string(),
         },
         Ok(()),
-        Err(Code::InvalidArgument)
+        Err(Code::Unauthenticated)
     )]
     #[case::db_error(
         DeleteSessionReq {

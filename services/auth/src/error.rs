@@ -17,7 +17,7 @@ pub enum Error {
     MissingOauthAccountID,
 
     #[error("missing token")]
-    #[status(InvalidArgument)]
+    #[status(Unauthenticated)]
     MissingToken,
 
     #[error("invalid token")]

@@ -28,8 +28,7 @@ where
     /// the expiration and comparing the secret against the hash.
     ///
     /// # Errors
-    /// - `InvalidArgument` if the token is missing or malformed
-    /// - `Unauthenticated` if the session is expired or secret is invalid
+    /// - `Unauthenticated` if the token is missing, malformed, expired, or secret is invalid
     /// - `Internal` if the database query fails
     ///
     /// # Further readings
@@ -126,7 +125,7 @@ mod tests {
         Ok(fixture_session(|_| {})),
         0,
         0,
-        Err(Code::InvalidArgument)
+        Err(Code::Unauthenticated)
     )]
     #[case::invalid_format(
         ValidateSessionReq {
@@ -135,7 +134,7 @@ mod tests {
         Ok(fixture_session(|_| {})),
         0,
         0,
-        Err(Code::InvalidArgument)
+        Err(Code::Unauthenticated)
     )]
     #[case::not_found(
         ValidateSessionReq {
