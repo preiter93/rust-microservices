@@ -29,11 +29,13 @@ impl PostgresDBClient {
 mod tests {
     use crate::database::test_helpers::run_db_test;
     use crate::fixture::fixture_entity;
+    use uuid::Uuid;
 
     #[tokio::test]
     async fn test_insert_entity() {
         run_db_test(|db_client| async move {
             let entity = fixture_entity(|e| {
+                e.id = Uuid::new_v4();
                 e.name = "test-insert".to_string();
             });
 

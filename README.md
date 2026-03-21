@@ -6,7 +6,7 @@ This project is an exploration in creating a standard setup for a microservice b
 
 ## Overview
 
-This project is an opinionated base setup for sveltekit apps with a rust based microservice backend.
+This project is an base setup for a rust based microservice backend.
 
 ## Services
 
@@ -63,7 +63,7 @@ I use a custom version of `cargo-chef` (not the main release), because of a fix 
 
 #### Alternative docker strategy
 
-At the moment I build the binary within the docker build process. For Rust images this can be very slow 🐌. I put a lot of effor into caching everything optimally and reduce this time, but if a central dependency changes this can be a pain.An alternative would be to build the binary outside of docker and copy the binary into a minimal docker image (e.g., `scratch` or `alpine`). If I am honest, this sounds like the more scalable approach. But my software engineering pride resisted that idea in the beginning, there is something more elegant about building everything within docker.
+At the moment I build the binary within the docker build process. For Rust images this can be very slow. I put a lot of effor into caching everything optimally and reduce this time, but if a central dependency changes this can be a pain.An alternative would be to build the binary outside of docker and copy the binary into a minimal docker image (e.g., `scratch` or `alpine`). If I am honest, this sounds like the more scalable approach. But my software engineering pride resisted that idea in the beginning, there is something more elegant about building everything within docker.
 
 ## Authentication
 
@@ -133,21 +133,21 @@ Traces are propagated between microservices
 
 Do I promise this works flawlessly? No. There might be the one or other steps you have to do manually. Feel free to let me know.
 
-# But how does it compare to go?
+# How does it compare to go?
 
-I use go professionally, so I think I can give a bit of perspective. The tldr is: for large software projects I’d still choose go for the majority of services, but I’d definitely consider Rust for performance-critical parts (see this good read: https://engineering.grab.com/counter-service-how-we-rewrote-it-in-rust). So having a standard Rust setup in the toolkit is a win. For a hobby project like this one? I just prefer writing Rust. Its like solving puzzles for me.
+The tldr is: for large software projects I’d still choose go for the majority of services, but I’d definitely consider Rust for performance-critical parts (see this good read: https://engineering.grab.com/counter-service-how-we-rewrote-it-in-rust). And I just prefer writing Rust.
 
-**What I love about Rust:**
-- I just love the language more than Go. It’s more expressive and I feel good if I manage to write a nice functional style map or find a good use case for traits.
+**Why Rust:**
 - Type safety. In Go it’s easy to forget passing values to structs and let’s be honest, who creates explicit constructors for everything?
 - Performance: blazingly fast. But have I benchmarked? No. And does it matter for my app with 1 user (me)? Not really. But it is nice to know once it matters, Rust is the right tool.
 - Nil pointer exception: In Go it’s just a tad too easy to get a nil pointer exception and crash your microservice. Want to access a nested proto struct but haven’t checked the parent for nil? Boom...
 - Compile time features: As an example, it is nice to use rusts features to put shared testutils in a service. In Go, it’s not straightforward to share testutils without polluting the public API between services.
 - Error handling: I don’t mind Go’s verbosity, but Rust's approach feels nicer, and with `anyhow` and `thiserror` it also as a better ecosystem in my opinion.
 - No garbage collection: Just one problem less to care for.
+- And I just like the language more than Go.
 
 **The negatives:**
-- The big one is compile time/docker time. Rebuilding a full service from scratch in Docker on a mac can take up to 10 minutes. Want to parallelize this over 10 microservices? Your memory is killed. I put a lot of effort into optimizing caching, using cargo-chef, fixing cargo-chef, autogenerating optimal Dockerfiles (see architecture). But here Go just wins. Maybe I just need to crank some compiler flags in Rust to make it bearable?
+- Compile time. Rebuilding a full service from scratch in Docker on a mac can take up to 10 minutes. Want to parallelize this over 10 microservices? Your memory is killed. I put a lot of effort into optimizing caching, using cargo-chef, fixing cargo-chef, autogenerating optimal Dockerfiles (see architecture). But here Go just wins. Maybe I just need to crank some compiler flags in Rust to make it bearable?
 - Table testing is a bit cumbersome in Rust. I use rstest and really like it, but it’s macro-based, which always breaks my formatting in nvim...
 - gRPC gateway: I thought this was a standard gRPC thing. Was surprised Rust doesn’t have a good gRPC gateway. Maybe tonic adds one at some point? (https://github.com/hyperium/tonic/issues/332)
 - HTTP/gRPC middleware: Took me quite some time to write gRPC middleware in Rust. That’s a lot easier in Go, but once you figure out the Rust/tower way, it’s kinda fun.

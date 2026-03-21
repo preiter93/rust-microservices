@@ -25,7 +25,7 @@ impl PostgresDBClient {
             return Err(DBError::NotFound);
         };
 
-        Ok(Entity::try_from(row)?)
+        Entity::try_from(row)
     }
 }
 
