@@ -37,7 +37,7 @@ where
         })?;
 
         Ok(Response::new(GetEntityResp {
-            entity: Some(entity),
+            entity: Some(entity.into()),
         }))
     }
 }
@@ -53,7 +53,8 @@ mod tests {
         error::DBError,
         fixture::{fixture_entity, fixture_get_entity_req, fixture_get_entity_resp},
         handler::Handler,
-        proto::{Entity, GetEntityReq, GetEntityResp},
+        model::Entity,
+        proto::{GetEntityReq, GetEntityResp},
     };
 
     #[rstest]

@@ -11,9 +11,9 @@ use tonic::async_trait;
 
 use crate::{
     SERVICE_NAME,
+    model::OAuthAccount,
     oauth::{config::OauthConfig, error::Error, models::OAuth2Token},
     proto::OauthProvider,
-    utils::OAuthAccount,
 };
 
 /// GitHub OAuth 2.0 endpoints.

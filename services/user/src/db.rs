@@ -1,16 +1,15 @@
 use crate::error::DBError;
+use crate::model::User;
 use deadpool_postgres::Pool;
 use std::fmt::Debug;
 use tokio_postgres::Row;
 use tonic::async_trait;
 use uuid::Uuid;
 
-use crate::proto::User;
-
 #[cfg_attr(test, mock::db_client)]
 #[async_trait]
 pub trait DBClient: Send + Sync + 'static {
-    async fn insert_user(&self, id: Uuid, name: &str, email: &str) -> Result<(), DBError>;
+    async fn insert_user(&self, user: &User) -> Result<(), DBError>;
 
     async fn get_user(&self, id: Uuid) -> Result<User, DBError>;
 }
@@ -32,13 +31,13 @@ impl DBClient for PostgresDBClient {
     /// # Errors
     /// - if the database connection cannot be established
     /// - if the database query fails
-    async fn insert_user(&self, id: Uuid, name: &str, email: &str) -> Result<(), DBError> {
+    async fn insert_user(&self, user: &User) -> Result<(), DBError> {
         let client = self.pool.get().await?;
 
         client
             .execute(
                 "INSERT INTO users (id, name, email) VALUES ($1, $2, $3)",
-                &[&id, &name, &email],
+                &[&user.id, &user.name, &user.email],
             )
             .await?;
 
@@ -67,16 +66,12 @@ impl DBClient for PostgresDBClient {
 impl TryFrom<Row> for User {
     type Error = DBError;
 
-    fn try_from(value: Row) -> Result<Self, DBError> {
-        let id: Uuid = value.try_get("id")?;
-        let name: String = value.try_get("name")?;
-        let email: String = value.try_get("email")?;
+    fn try_from(row: Row) -> Result<Self, DBError> {
+        let id: Uuid = row.try_get("id")?;
+        let name: String = row.try_get("name")?;
+        let email: String = row.try_get("email")?;
 
-        Ok(User {
-            id: id.to_string(),
-            name,
-            email,
-        })
+        Ok(User { id, name, email })
     }
 }
 
@@ -84,15 +79,14 @@ impl TryFrom<Row> for User {
 pub mod test {
     pub(crate) use super::MockDBClient;
     use super::*;
-    use crate::error::DBError;
-    use crate::fixture::{DBUser, fixture_db_user, fixture_user, fixture_uuid};
-    use crate::proto::User;
+    use crate::fixture::{fixture_user, fixture_uuid};
+    use crate::model::User;
     use rstest::rstest;
     use testutils::get_test_db;
     use user::SERVICE_NAME;
     use uuid::Uuid;
 
-    async fn run_db_test<F, Fut>(given_user: Vec<DBUser>, test_fn: F)
+    async fn run_db_test<F, Fut>(given_users: Vec<User>, test_fn: F)
     where
         F: FnOnce(PostgresDBClient) -> Fut,
         Fut: std::future::Future<Output = ()>,
@@ -103,9 +97,9 @@ pub mod test {
             .expect("failed to get connection to test db");
         let db_client = PostgresDBClient { pool };
 
-        for user in given_user {
+        for user in &given_users {
             db_client
-                .insert_user(user.id.clone(), &user.name, &user.email)
+                .insert_user(user)
                 .await
                 .expect("failed to insert user");
         }
@@ -116,7 +110,7 @@ pub mod test {
     #[rstest]
     #[case::happy_path(
         fixture_uuid(),
-        vec![fixture_db_user(|_| {})],
+        vec![fixture_user(|_| {})],
         Ok(fixture_user(|_| {}))
     )]
     #[case::not_found(
@@ -127,7 +121,7 @@ pub mod test {
     #[tokio::test]
     async fn test_get_user(
         #[case] user_id: Uuid,
-        #[case] given_users: Vec<DBUser>,
+        #[case] given_users: Vec<User>,
         #[case] want: Result<User, DBError>,
     ) {
         run_db_test(given_users, |db_client| async move {

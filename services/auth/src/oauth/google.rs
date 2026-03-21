@@ -4,9 +4,9 @@ use oauth::{OAuth, OAuthProvider, RandomSource, SecureRandom};
 use tonic::async_trait;
 
 use crate::{
+    model::OAuthAccount,
     oauth::{config::OauthConfig, error::Error, models::OAuth2Token},
     proto::OauthProvider,
-    utils::OAuthAccount,
 };
 
 /// Google OAuth 2.0 endpoints.

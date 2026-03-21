@@ -31,7 +31,9 @@ where
             _ => Error::GetUser(e),
         })?;
 
-        Ok(Response::new(GetUserResp { user: Some(user) }))
+        Ok(Response::new(GetUserResp {
+            user: Some(user.into()),
+        }))
     }
 }
 
@@ -44,40 +46,41 @@ mod tests {
     use crate::{
         db::test::MockDBClient,
         error::DBError,
-        fixture::{fixture_user, fixture_uuid},
+        fixture::{fixture_get_user_req, fixture_get_user_resp, fixture_user},
         handler::Handler,
-        proto::{GetUserReq, GetUserResp, User},
+        model::User,
+        proto::{GetUserReq, GetUserResp},
     };
 
     #[rstest]
     #[case::happy_path(
-        fixture_uuid().to_string(),
+        fixture_get_user_req(|_| {}),
         Ok(fixture_user(|_| {})),
-        Ok(GetUserResp { user: Some(fixture_user(|_| {})) })
+        Ok(fixture_get_user_resp(|_| {})),
     )]
     #[case::missing_id(
-        "".to_string(),
+        fixture_get_user_req(|r| { r.id = "".to_string() }),
         Ok(fixture_user(|_| {})),
         Err(Code::InvalidArgument)
     )]
     #[case::not_a_uuid(
-        "not-uuid".to_string(),
+        fixture_get_user_req(|r| { r.id = "not-a-uuid".to_string() }),
         Ok(fixture_user(|_| {})),
         Err(Code::InvalidArgument)
     )]
     #[case::not_found(
-        fixture_uuid().to_string(),
+        fixture_get_user_req(|_| {}),
         Err(DBError::NotFound),
         Err(Code::NotFound)
     )]
     #[case::internal_error(
-        fixture_uuid().to_string(),
+        fixture_get_user_req(|_| {}),
         Err(DBError::Unknown),
         Err(Code::Internal)
     )]
     #[tokio::test]
     async fn test_get_user(
-        #[case] id: String,
+        #[case] req: GetUserReq,
         #[case] db_result: Result<User, DBError>,
         #[case] want: Result<GetUserResp, Code>,
     ) {
@@ -94,7 +97,7 @@ mod tests {
         };
 
         // when
-        let got = service.get_user(Request::new(GetUserReq { id })).await;
+        let got = service.get_user(Request::new(req)).await;
 
         // then
         assert_response(got, want);

@@ -6,12 +6,22 @@ service DummyService {
     rpc GetEntity(GetEntityReq) returns (GetEntityResp) {}
 }
 
+message NewEntity {
+    string name = 1;
+}
+
 message CreateEntityReq {
     string user_id = 1;
+    NewEntity entity = 2;
 }
 
 message CreateEntityResp {
     Entity entity = 1;
+}
+
+message Entity {
+    string id = 1;
+    string name = 2;
 }
 
 message GetEntityReq {
@@ -21,8 +31,4 @@ message GetEntityReq {
 
 message GetEntityResp {
     Entity entity = 1;
-}
-
-message Entity {
-    string id = 1;
 }

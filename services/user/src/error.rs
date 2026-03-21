@@ -4,6 +4,10 @@ use thiserror::Error;
 #[derive(Debug, Error, Status)]
 #[non_exhaustive]
 pub enum Error {
+    #[error("missing user")]
+    #[status(InvalidArgument)]
+    MissingUser,
+
     #[error("missing user id")]
     #[status(InvalidArgument)]
     MissingUserId,

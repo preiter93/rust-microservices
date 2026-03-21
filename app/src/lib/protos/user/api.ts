@@ -8,11 +8,16 @@
 
 export const protobufPackage = "user";
 
-export interface CreateUserReq {
+export interface NewUser {
   /** The user's display name. */
   name: string;
   /** The user's email address. */
   email: string;
+}
+
+export interface CreateUserReq {
+  /** The new user to create. */
+  user?: NewUser | undefined;
 }
 
 export interface CreateUserResp {
@@ -39,19 +44,19 @@ export interface User {
   email: string;
 }
 
-function createBaseCreateUserReq(): CreateUserReq {
+function createBaseNewUser(): NewUser {
   return { name: "", email: "" };
 }
 
-export const CreateUserReq: MessageFns<CreateUserReq> = {
-  fromJSON(object: any): CreateUserReq {
+export const NewUser: MessageFns<NewUser> = {
+  fromJSON(object: any): NewUser {
     return {
       name: isSet(object.name) ? globalThis.String(object.name) : "",
       email: isSet(object.email) ? globalThis.String(object.email) : "",
     };
   },
 
-  toJSON(message: CreateUserReq): unknown {
+  toJSON(message: NewUser): unknown {
     const obj: any = {};
     if (message.name !== "") {
       obj.name = message.name;
@@ -62,13 +67,40 @@ export const CreateUserReq: MessageFns<CreateUserReq> = {
     return obj;
   },
 
+  create<I extends Exact<DeepPartial<NewUser>, I>>(base?: I): NewUser {
+    return NewUser.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<NewUser>, I>>(object: I): NewUser {
+    const message = createBaseNewUser();
+    message.name = object.name ?? "";
+    message.email = object.email ?? "";
+    return message;
+  },
+};
+
+function createBaseCreateUserReq(): CreateUserReq {
+  return { user: undefined };
+}
+
+export const CreateUserReq: MessageFns<CreateUserReq> = {
+  fromJSON(object: any): CreateUserReq {
+    return { user: isSet(object.user) ? NewUser.fromJSON(object.user) : undefined };
+  },
+
+  toJSON(message: CreateUserReq): unknown {
+    const obj: any = {};
+    if (message.user !== undefined) {
+      obj.user = NewUser.toJSON(message.user);
+    }
+    return obj;
+  },
+
   create<I extends Exact<DeepPartial<CreateUserReq>, I>>(base?: I): CreateUserReq {
     return CreateUserReq.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<CreateUserReq>, I>>(object: I): CreateUserReq {
     const message = createBaseCreateUserReq();
-    message.name = object.name ?? "";
-    message.email = object.email ?? "";
+    message.user = (object.user !== undefined && object.user !== null) ? NewUser.fromPartial(object.user) : undefined;
     return message;
   },
 };

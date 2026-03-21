@@ -8,12 +8,22 @@
 
 export const protobufPackage = "dummy";
 
+export interface NewEntity {
+  name: string;
+}
+
 export interface CreateEntityReq {
   userId: string;
+  entity?: NewEntity | undefined;
 }
 
 export interface CreateEntityResp {
   entity?: Entity | undefined;
+}
+
+export interface Entity {
+  id: string;
+  name: string;
 }
 
 export interface GetEntityReq {
@@ -25,12 +35,35 @@ export interface GetEntityResp {
   entity?: Entity | undefined;
 }
 
-export interface Entity {
-  id: string;
+function createBaseNewEntity(): NewEntity {
+  return { name: "" };
 }
 
+export const NewEntity: MessageFns<NewEntity> = {
+  fromJSON(object: any): NewEntity {
+    return { name: isSet(object.name) ? globalThis.String(object.name) : "" };
+  },
+
+  toJSON(message: NewEntity): unknown {
+    const obj: any = {};
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<NewEntity>, I>>(base?: I): NewEntity {
+    return NewEntity.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<NewEntity>, I>>(object: I): NewEntity {
+    const message = createBaseNewEntity();
+    message.name = object.name ?? "";
+    return message;
+  },
+};
+
 function createBaseCreateEntityReq(): CreateEntityReq {
-  return { userId: "" };
+  return { userId: "", entity: undefined };
 }
 
 export const CreateEntityReq: MessageFns<CreateEntityReq> = {
@@ -41,6 +74,7 @@ export const CreateEntityReq: MessageFns<CreateEntityReq> = {
         : isSet(object.user_id)
         ? globalThis.String(object.user_id)
         : "",
+      entity: isSet(object.entity) ? NewEntity.fromJSON(object.entity) : undefined,
     };
   },
 
@@ -48,6 +82,9 @@ export const CreateEntityReq: MessageFns<CreateEntityReq> = {
     const obj: any = {};
     if (message.userId !== "") {
       obj.userId = message.userId;
+    }
+    if (message.entity !== undefined) {
+      obj.entity = NewEntity.toJSON(message.entity);
     }
     return obj;
   },
@@ -58,6 +95,9 @@ export const CreateEntityReq: MessageFns<CreateEntityReq> = {
   fromPartial<I extends Exact<DeepPartial<CreateEntityReq>, I>>(object: I): CreateEntityReq {
     const message = createBaseCreateEntityReq();
     message.userId = object.userId ?? "";
+    message.entity = (object.entity !== undefined && object.entity !== null)
+      ? NewEntity.fromPartial(object.entity)
+      : undefined;
     return message;
   },
 };
@@ -87,6 +127,40 @@ export const CreateEntityResp: MessageFns<CreateEntityResp> = {
     message.entity = (object.entity !== undefined && object.entity !== null)
       ? Entity.fromPartial(object.entity)
       : undefined;
+    return message;
+  },
+};
+
+function createBaseEntity(): Entity {
+  return { id: "", name: "" };
+}
+
+export const Entity: MessageFns<Entity> = {
+  fromJSON(object: any): Entity {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+    };
+  },
+
+  toJSON(message: Entity): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Entity>, I>>(base?: I): Entity {
+    return Entity.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Entity>, I>>(object: I): Entity {
+    const message = createBaseEntity();
+    message.id = object.id ?? "";
+    message.name = object.name ?? "";
     return message;
   },
 };
@@ -154,33 +228,6 @@ export const GetEntityResp: MessageFns<GetEntityResp> = {
     message.entity = (object.entity !== undefined && object.entity !== null)
       ? Entity.fromPartial(object.entity)
       : undefined;
-    return message;
-  },
-};
-
-function createBaseEntity(): Entity {
-  return { id: "" };
-}
-
-export const Entity: MessageFns<Entity> = {
-  fromJSON(object: any): Entity {
-    return { id: isSet(object.id) ? globalThis.String(object.id) : "" };
-  },
-
-  toJSON(message: Entity): unknown {
-    const obj: any = {};
-    if (message.id !== "") {
-      obj.id = message.id;
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<Entity>, I>>(base?: I): Entity {
-    return Entity.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<Entity>, I>>(object: I): Entity {
-    const message = createBaseEntity();
-    message.id = object.id ?? "";
     return message;
   },
 };

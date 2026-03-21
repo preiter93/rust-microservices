@@ -42,9 +42,9 @@ mod tests {
         error::DBError,
         fixture::fixture_oauth_account,
         handler::Handler,
+        model::OAuthAccount,
         oauth::{github::GithubOAuth, google::GoogleOAuth},
         proto::{GetOauthAccountReq, GetOauthAccountResp, OauthProvider},
-        utils::OAuthAccount,
     };
     use common::mock::MockNow;
     use oauth::mock::MockRandom;

@@ -7,6 +7,7 @@ pub(crate) mod get_oauth_account;
 pub(crate) mod handle_oauth_callback;
 pub(crate) mod handler;
 pub(crate) mod link_oauth_account;
+pub(crate) mod model;
 pub(crate) mod oauth;
 #[allow(clippy::all)]
 pub(crate) mod proto;

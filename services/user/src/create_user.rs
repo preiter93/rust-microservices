@@ -2,7 +2,8 @@ use crate::{
     db::DBClient,
     error::Error,
     handler::Handler,
-    proto::{CreateUserReq, CreateUserResp, User},
+    model,
+    proto::{CreateUserReq, CreateUserResp},
 };
 use common::UuidGenerator;
 use tonic::{Request, Response, Status};
@@ -15,38 +16,27 @@ where
     /// Creates a new user.
     ///
     /// # Errors
-    /// - `InvalidArgument` if the user name or email is empty
+    /// - `InvalidArgument` if the user is missing, name is empty, or email is empty
     /// - `Internal` if the user cannot be inserted into the db
     pub async fn create_user(
         &self,
         req: Request<CreateUserReq>,
     ) -> Result<Response<CreateUserResp>, Status> {
         let req = req.into_inner();
-        let id = self.uuid.generate();
 
-        tracing::Span::current().record("user_id", id.to_string());
+        let new_user = req.user.ok_or(Error::MissingUser)?;
 
-        let name = req.name;
-        if name.is_empty() {
-            return Err(Error::MissingUserName.into());
-        }
+        let user = model::User::new(self.uuid.generate(), new_user)?;
 
-        let email = req.email;
-        if email.is_empty() {
-            return Err(Error::MissingUserEmail.into());
-        }
+        tracing::Span::current().record("user_id", user.id.to_string());
 
         self.db
-            .insert_user(id, &name, &email)
+            .insert_user(&user)
             .await
             .map_err(Error::InsertUser)?;
 
         let response = CreateUserResp {
-            user: Some(User {
-                id: id.to_string(),
-                name,
-                email,
-            }),
+            user: Some(user.into()),
         };
 
         Ok(Response::new(response))
@@ -58,9 +48,10 @@ mod tests {
     use crate::{
         db::test::MockDBClient,
         error::DBError,
-        fixture::{fixture_create_user_req, fixture_user},
+        fixture::{fixture_create_user_req, fixture_proto_user},
         handler::Handler,
-        proto::{CreateUserReq, CreateUserResp},
+        proto::CreateUserReq,
+        proto::CreateUserResp,
     };
     use common::mock::MockUuidGenerator;
     use rstest::rstest;
@@ -71,15 +62,20 @@ mod tests {
     #[case::happy(
         fixture_create_user_req(|_| {}),
         Ok(()),
-        Ok(CreateUserResp { user: Some(fixture_user(|_| {})) })
+        Ok(CreateUserResp { user: Some(fixture_proto_user(|_| {})) })
+    )]
+    #[case::missing_user(
+        fixture_create_user_req(|r| r.user = None),
+        Ok(()),
+        Err(Code::InvalidArgument)
     )]
     #[case::missing_name(
-        fixture_create_user_req(|r| r.name.clear()),
+        fixture_create_user_req(|r| r.user.as_mut().unwrap().name.clear()),
         Ok(()),
         Err(Code::InvalidArgument)
     )]
     #[case::missing_email(
-        fixture_create_user_req(|r| r.email.clear()),
+        fixture_create_user_req(|r| r.user.as_mut().unwrap().email.clear()),
         Ok(()),
         Err(Code::InvalidArgument)
     )]

@@ -99,11 +99,11 @@ mod tests {
     use crate::{
         db::test::MockDBClient,
         error::DBError,
-        fixture::{fixture_db_session, fixture_token, fixture_uuid},
+        fixture::{fixture_session, fixture_token, fixture_uuid},
         handler::Handler,
+        model::Session,
         oauth::{github::GithubOAuth, google::GoogleOAuth},
         proto::{ValidateSessionReq, ValidateSessionResp},
-        utils::DBSession,
     };
 
     #[rstest]
@@ -111,7 +111,7 @@ mod tests {
         ValidateSessionReq {
             token: fixture_token(),
         },
-        Ok(fixture_db_session(|_| {})),
+        Ok(fixture_session(|_| {})),
         0,
         0,
         Ok(ValidateSessionResp {
@@ -123,7 +123,7 @@ mod tests {
         ValidateSessionReq {
             token: String::new(),
         },
-        Ok(fixture_db_session(|_| {})),
+        Ok(fixture_session(|_| {})),
         0,
         0,
         Err(Code::InvalidArgument)
@@ -132,7 +132,7 @@ mod tests {
         ValidateSessionReq {
             token: "invalid-format".to_string(),
         },
-        Ok(fixture_db_session(|_| {})),
+        Ok(fixture_session(|_| {})),
         0,
         0,
         Err(Code::InvalidArgument)
@@ -150,7 +150,7 @@ mod tests {
         ValidateSessionReq {
             token: fixture_token(),
         },
-        Ok(fixture_db_session(|session| {
+        Ok(fixture_session(|session| {
             session.expires_at = chrono::Utc.with_ymd_and_hms(2020, 1, 1, 0, 0, 0).unwrap();
         })),
         0,
@@ -161,7 +161,7 @@ mod tests {
         ValidateSessionReq {
             token: fixture_token(),
         },
-        Ok(fixture_db_session(|session| {
+        Ok(fixture_session(|session| {
             session.expires_at = chrono::Utc.with_ymd_and_hms(2020, 1, 2, 0, 0, 0).unwrap();
         })),
         1,
@@ -175,7 +175,7 @@ mod tests {
         ValidateSessionReq {
             token: fixture_token(),
         },
-        Ok(fixture_db_session(|session| {
+        Ok(fixture_session(|session| {
             session.secret_hash = vec![1];
         })),
         0,
@@ -194,7 +194,7 @@ mod tests {
     #[tokio::test]
     async fn test_validate_session(
         #[case] req: ValidateSessionReq,
-        #[case] db_result: Result<DBSession, DBError>,
+        #[case] db_result: Result<Session, DBError>,
         #[case] want_update_count: usize,
         #[case] want_delete_count: usize,
         #[case] want: Result<ValidateSessionResp, Code>,

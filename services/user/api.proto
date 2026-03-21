@@ -10,11 +10,16 @@ service UserService {
     rpc GetUser(GetUserReq) returns (GetUserResp) {}
 }
 
-message CreateUserReq {
+message NewUser {
     // The user's display name.
     string name = 1;
     // The user's email address.
     string email = 2;
+}
+
+message CreateUserReq {
+    // The new user to create.
+    NewUser user = 1;
 }
 
 message CreateUserResp {

@@ -3,6 +3,7 @@ pub mod db;
 pub mod error;
 pub mod get_entity;
 pub mod handler;
+pub mod model;
 #[allow(clippy::all)]
 pub mod proto;
 pub mod utils;

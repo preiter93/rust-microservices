@@ -1,16 +1,15 @@
 use crate::error::DBError;
+use crate::model::Entity;
 use deadpool_postgres::Pool;
 use std::fmt::Debug;
 use tokio_postgres::Row;
 use tonic::async_trait;
 use uuid::Uuid;
 
-use crate::proto::Entity;
-
 #[cfg_attr(test, mock::db_client)]
 #[async_trait]
 pub trait DBClient: Send + Sync + 'static {
-    async fn insert_entity(&self, id: Uuid, user_id: Uuid) -> Result<(), DBError>;
+    async fn insert_entity(&self, entity: &Entity) -> Result<(), DBError>;
 
     async fn get_entity(&self, id: Uuid, user_id: Uuid) -> Result<Entity, DBError>;
 }
@@ -32,13 +31,13 @@ impl DBClient for PostgresDBClient {
     /// # Errors
     /// - if the database connection cannot be established
     /// - if the database query fails
-    async fn insert_entity(&self, id: Uuid, user_id: Uuid) -> Result<(), DBError> {
+    async fn insert_entity(&self, entity: &Entity) -> Result<(), DBError> {
         let client = self.pool.get().await?;
 
         client
             .execute(
-                "INSERT INTO entities (id, user_id) VALUES ($1, $2)",
-                &[&id, &user_id],
+                "INSERT INTO entities (id, user_id, name) VALUES ($1, $2, $3)",
+                &[&entity.id, &entity.user_id, &entity.name],
             )
             .await?;
 
@@ -53,7 +52,7 @@ impl DBClient for PostgresDBClient {
         let client = self.pool.get().await?;
 
         let stmt = client
-            .prepare("SELECT id FROM entities WHERE id = $1 and user_id = $2")
+            .prepare("SELECT id, user_id, name FROM entities WHERE id = $1 AND user_id = $2")
             .await?;
         let row = client.query_opt(&stmt, &[&id, &user_id]).await?;
         let Some(row) = row else {
@@ -67,10 +66,12 @@ impl DBClient for PostgresDBClient {
 impl TryFrom<Row> for Entity {
     type Error = DBError;
 
-    fn try_from(value: Row) -> Result<Self, DBError> {
-        let id: Uuid = value.try_get("id")?;
+    fn try_from(row: Row) -> Result<Self, DBError> {
+        let id: Uuid = row.try_get("id")?;
+        let user_id: Uuid = row.try_get("user_id")?;
+        let name: String = row.try_get("name")?;
 
-        Ok(Entity { id: id.to_string() })
+        Ok(Entity { id, user_id, name })
     }
 }
 
@@ -80,13 +81,13 @@ pub mod test {
     use super::*;
     use crate::SERVICE_NAME;
     use crate::error::DBError;
-    use crate::fixture::{DBEntity, fixture_db_entity, fixture_entity, fixture_uuid};
-    use crate::proto::Entity;
+    use crate::fixture::{fixture_entity, fixture_uuid};
+    use crate::model::Entity;
     use rstest::rstest;
     use testutils::get_test_db;
     use uuid::Uuid;
 
-    async fn run_db_test<F, Fut>(given_entity: Vec<DBEntity>, test_fn: F)
+    async fn run_db_test<F, Fut>(given_entities: Vec<Entity>, test_fn: F)
     where
         F: FnOnce(PostgresDBClient) -> Fut,
         Fut: std::future::Future<Output = ()>,
@@ -97,9 +98,9 @@ pub mod test {
             .expect("failed to get connection to test db");
         let db_client = PostgresDBClient { pool };
 
-        for entity in given_entity {
+        for entity in &given_entities {
             db_client
-                .insert_entity(entity.id.clone(), entity.user_id.clone())
+                .insert_entity(entity)
                 .await
                 .expect("failed to insert entity");
         }
@@ -110,7 +111,7 @@ pub mod test {
     #[rstest]
     #[case::happy_path(
         fixture_uuid(),
-        vec![fixture_db_entity(|_| {})],
+        vec![fixture_entity(|_| {})],
         Ok(fixture_entity(|_| {}))
     )]
     #[case::not_found(
@@ -121,12 +122,10 @@ pub mod test {
     #[tokio::test]
     async fn test_get_entity(
         #[case] entity_id: Uuid,
-        #[case] given_entity: Vec<DBEntity>,
+        #[case] given_entities: Vec<Entity>,
         #[case] want: Result<Entity, DBError>,
     ) {
-        run_db_test(given_entity, |db_client| async move {
-            use crate::fixture::fixture_uuid;
-
+        run_db_test(given_entities, |db_client| async move {
             let user_id = fixture_uuid();
             let got = db_client.get_entity(entity_id, user_id).await;
 

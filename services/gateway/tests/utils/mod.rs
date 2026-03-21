@@ -6,7 +6,9 @@ use auth::proto::{CreateSessionReq, auth_service_client::AuthServiceClient as Au
 use axum::http::{HeaderMap, HeaderValue};
 use reqwest::header::COOKIE;
 use tonic::{Request, transport::Endpoint};
-use user::proto::{CreateUserReq, User, user_service_client::UserServiceClient as UserClient};
+use user::proto::{
+    CreateUserReq, NewUser, User, user_service_client::UserServiceClient as UserClient,
+};
 
 use crate::utils::testcontainers::TestContainers;
 
@@ -44,8 +46,10 @@ pub(crate) async fn create_authenticated_user(
     let mut user_client = UserClient::new(channel);
 
     let req = Request::new(CreateUserReq {
-        name: "integration-test-name".to_string(),
-        email: "integration-test-email".to_string(),
+        user: Some(NewUser {
+            name: "integration-test-name".to_string(),
+            email: "integration-test-email".to_string(),
+        }),
     });
     let resp = user_client.create_user(req).await?;
     let user = resp.into_inner().user.unwrap();

@@ -4,6 +4,14 @@ use thiserror::Error;
 #[derive(Debug, Error, Status)]
 #[non_exhaustive]
 pub enum Error {
+    #[error("missing entity")]
+    #[status(InvalidArgument)]
+    MissingEntity,
+
+    #[error("missing entity name")]
+    #[status(InvalidArgument)]
+    MissingEntityName,
+
     #[error("missing entity id")]
     #[status(InvalidArgument)]
     MissingEntityId,

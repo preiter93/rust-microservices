@@ -2,8 +2,9 @@ use crate::{
     db::DBClient,
     error::Error,
     handler::{Handler, SessionToken},
+    model::Session,
     proto::{CreateSessionReq, CreateSessionResp},
-    utils::{DBSession, hash_secret},
+    utils::hash_secret,
 };
 use common::Now;
 use oauth::RandomSource;
@@ -36,7 +37,7 @@ where
         let secret = R::alphanumeric(24);
         let token: SessionToken = format!("{id}.{secret}");
 
-        let session = DBSession {
+        let session = Session {
             id,
             secret_hash: hash_secret(&secret),
             created_at: N::now(),
