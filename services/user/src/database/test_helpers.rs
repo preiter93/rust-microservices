@@ -40,3 +40,12 @@ impl DbTestBuilder {
         test_fn(db_client).await;
     }
 }
+
+/// Simple helper for tests that don't need seeding.
+pub async fn run_db_test<F, Fut>(test_fn: F)
+where
+    F: FnOnce(PostgresDBClient) -> Fut,
+    Fut: std::future::Future<Output = ()>,
+{
+    DbTestBuilder::new().run(test_fn).await;
+}

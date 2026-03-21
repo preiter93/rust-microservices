@@ -27,19 +27,21 @@ impl PostgresDBClient {
 
 #[cfg(test)]
 mod tests {
-    use crate::{database::test_helpers::DbTestBuilder, fixture::fixture_user};
+    use crate::database::test_helpers::run_db_test;
+    use crate::fixture::fixture_user;
+    use uuid::Uuid;
 
     #[tokio::test]
     async fn test_insert_user() {
-        DbTestBuilder::new()
-            .run(|db_client| async move {
-                let user = fixture_user(|u| {
-                    u.name = "test-insert".to_string();
-                });
+        run_db_test(|db_client| async move {
+            let user = fixture_user(|u| {
+                u.id = Uuid::new_v4();
+                u.name = "test-insert".to_string();
+            });
 
-                let result = db_client.insert_user(&user).await;
-                assert!(result.is_ok());
-            })
-            .await;
+            let result = db_client.insert_user(&user).await;
+            assert!(result.is_ok());
+        })
+        .await;
     }
 }
