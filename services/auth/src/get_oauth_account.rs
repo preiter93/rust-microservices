@@ -1,5 +1,5 @@
 use crate::{
-    db::DBClient,
+    database::DBClient,
     error::Error,
     handler::Handler,
     proto::{GetOauthAccountReq, GetOauthAccountResp},
@@ -38,11 +38,10 @@ where
 #[cfg(test)]
 mod tests {
     use crate::{
-        db::test::MockDBClient,
+        database::{MockDBClient, OAuthAccount},
         error::DBError,
         fixture::fixture_oauth_account,
         handler::Handler,
-        model::OAuthAccount,
         oauth::{github::GithubOAuth, google::GoogleOAuth},
         proto::{GetOauthAccountReq, GetOauthAccountResp, OauthProvider},
     };

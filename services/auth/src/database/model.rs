@@ -1,3 +1,5 @@
+//! Database model definitions.
+
 use chrono::{DateTime, Utc};
 use tokio_postgres::Row;
 use uuid::Uuid;

@@ -2,7 +2,7 @@
 
 use uuid::Uuid;
 
-use crate::model::Entity;
+use crate::database::Entity;
 use crate::proto::{self, CreateEntityReq, GetEntityReq, GetEntityResp, NewEntity};
 
 pub fn fixture_uuid() -> Uuid {

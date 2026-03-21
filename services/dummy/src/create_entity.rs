@@ -1,8 +1,7 @@
 use crate::{
-    db::DBClient,
+    database::{DBClient, Entity},
     error::Error,
     handler::Handler,
-    model,
     proto::{CreateEntityReq, CreateEntityResp},
 };
 use common::UuidGenerator;
@@ -30,7 +29,7 @@ where
 
         let new_entity = req.entity.ok_or(Error::MissingEntity)?;
 
-        let entity = model::Entity::new(self.uuid.generate(), user_id, new_entity)?;
+        let entity = Entity::from_proto(self.uuid.generate(), user_id, new_entity)?;
 
         self.db
             .insert_entity(&entity)
@@ -38,7 +37,7 @@ where
             .map_err(Error::InsertEntity)?;
 
         let response = CreateEntityResp {
-            entity: Some(entity.into()),
+            entity: Some(entity.to_proto()),
         };
 
         Ok(Response::new(response))
@@ -48,7 +47,7 @@ where
 #[cfg(test)]
 mod tests {
     use crate::{
-        db::test::MockDBClient,
+        database::MockDBClient,
         error::DBError,
         fixture::{fixture_create_entity_req, fixture_proto_entity},
         handler::Handler,

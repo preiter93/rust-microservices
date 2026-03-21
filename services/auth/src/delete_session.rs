@@ -1,7 +1,7 @@
 use tonic::{Request, Response, Status};
 
 use crate::{
-    db::DBClient,
+    database::DBClient,
     error::Error,
     handler::Handler,
     proto::{DeleteSessionReq, DeleteSessionResp},
@@ -57,7 +57,7 @@ mod tests {
     use tonic::{Code, Request};
 
     use crate::{
-        db::test::MockDBClient,
+        database::MockDBClient,
         error::DBError,
         fixture::fixture_token,
         handler::Handler,

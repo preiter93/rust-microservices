@@ -1,5 +1,5 @@
 use crate::{
-    db::DBClient,
+    database::DBClient,
     proto::{
         CreateUserReq, CreateUserResp, GetUserReq, GetUserResp, user_service_server::UserService,
     },

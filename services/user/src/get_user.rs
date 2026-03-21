@@ -1,5 +1,5 @@
 use crate::{
-    db::DBClient,
+    database::DBClient,
     error::{DBError, Error},
     handler::Handler,
     proto::{GetUserReq, GetUserResp},
@@ -32,7 +32,7 @@ where
         })?;
 
         Ok(Response::new(GetUserResp {
-            user: Some(user.into()),
+            user: Some(user.to_proto()),
         }))
     }
 }
@@ -44,11 +44,10 @@ mod tests {
     use tonic::{Code, Request};
 
     use crate::{
-        db::test::MockDBClient,
+        database::{MockDBClient, User},
         error::DBError,
         fixture::{fixture_get_user_req, fixture_get_user_resp, fixture_user},
         handler::Handler,
-        model::User,
         proto::{GetUserReq, GetUserResp},
     };
 

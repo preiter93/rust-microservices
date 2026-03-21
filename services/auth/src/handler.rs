@@ -11,7 +11,7 @@
 use std::marker::PhantomData;
 
 use crate::{
-    db::DBClient,
+    database::DBClient,
     oauth::{github::GithubOAuth, google::GoogleOAuth},
     proto::{
         CreateSessionReq, CreateSessionResp, DeleteSessionReq, DeleteSessionResp,

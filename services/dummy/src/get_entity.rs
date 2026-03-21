@@ -2,7 +2,7 @@ use crate::error::{DBError, Error};
 use crate::utils::validate_entity_id;
 
 use crate::{
-    db::DBClient,
+    database::DBClient,
     handler::Handler,
     proto::{GetEntityReq, GetEntityResp},
 };
@@ -37,7 +37,7 @@ where
         })?;
 
         Ok(Response::new(GetEntityResp {
-            entity: Some(entity.into()),
+            entity: Some(entity.to_proto()),
         }))
     }
 }
@@ -49,11 +49,10 @@ mod tests {
     use tonic::{Code, Request};
 
     use crate::{
-        db::test::MockDBClient,
+        database::{Entity, MockDBClient},
         error::DBError,
         fixture::{fixture_entity, fixture_get_entity_req, fixture_get_entity_resp},
         handler::Handler,
-        model::Entity,
         proto::{GetEntityReq, GetEntityResp},
     };
 

@@ -1,5 +1,5 @@
 use crate::{
-    db::DBClient,
+    database::DBClient,
     error::Error,
     handler::Handler,
     proto::{LinkOauthAccountReq, LinkOauthAccountResp},

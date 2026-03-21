@@ -7,7 +7,7 @@
 use tonic::{Request, Response, Status};
 
 use crate::{
-    db::DBClient,
+    database::DBClient,
     error::{DBError, Error},
     handler::Handler,
     proto::{ValidateSessionReq, ValidateSessionResp},
@@ -96,11 +96,10 @@ mod tests {
     use tonic::{Code, Request};
 
     use crate::{
-        db::test::MockDBClient,
+        database::{MockDBClient, Session},
         error::DBError,
         fixture::{fixture_session, fixture_token, fixture_uuid},
         handler::Handler,
-        model::Session,
         oauth::{github::GithubOAuth, google::GoogleOAuth},
         proto::{ValidateSessionReq, ValidateSessionResp},
     };

@@ -1,8 +1,7 @@
 use crate::{
-    db::DBClient,
+    database::{DBClient, User},
     error::Error,
     handler::Handler,
-    model,
     proto::{CreateUserReq, CreateUserResp},
 };
 use common::UuidGenerator;
@@ -26,7 +25,7 @@ where
 
         let new_user = req.user.ok_or(Error::MissingUser)?;
 
-        let user = model::User::new(self.uuid.generate(), new_user)?;
+        let user = User::from_proto(self.uuid.generate(), new_user)?;
 
         tracing::Span::current().record("user_id", user.id.to_string());
 
@@ -36,7 +35,7 @@ where
             .map_err(Error::InsertUser)?;
 
         let response = CreateUserResp {
-            user: Some(user.into()),
+            user: Some(user.to_proto()),
         };
 
         Ok(Response::new(response))
@@ -46,7 +45,7 @@ where
 #[cfg(test)]
 mod tests {
     use crate::{
-        db::test::MockDBClient,
+        database::MockDBClient,
         error::DBError,
         fixture::{fixture_create_user_req, fixture_proto_user},
         handler::Handler,

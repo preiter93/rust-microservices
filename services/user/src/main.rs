@@ -1,9 +1,8 @@
 pub mod create_user;
-pub mod db;
+pub mod database;
 pub mod error;
 pub mod get_user;
 pub mod handler;
-pub mod model;
 #[allow(clippy::all)]
 pub mod proto;
 
@@ -12,7 +11,7 @@ mod fixture;
 
 use crate::{handler::Handler, proto::user_service_server::UserServiceServer};
 use common::UuidV4Generator;
-use db::PostgresDBClient;
+use database::PostgresDBClient;
 use dotenv::dotenv;
 use setup::{middleware::TracingGrpcServiceLayer, tracing::init_tracer};
 use std::error::Error;
@@ -24,9 +23,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let tracer = init_tracer(SERVICE_NAME)?;
 
-    let pg_cfg = database::PGConfig::from_env(SERVICE_NAME)?;
-    let pool = database::connect(&pg_cfg)?;
-    database::run_migrations!(pool, "./migrations");
+    let pg_cfg = ::database::PGConfig::from_env(SERVICE_NAME)?;
+    let pool = ::database::connect(&pg_cfg)?;
+    ::database::run_migrations!(pool, "./migrations");
 
     let handler = Handler {
         db: PostgresDBClient::new(pool),

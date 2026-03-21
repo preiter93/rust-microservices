@@ -1,5 +1,5 @@
 use crate::{
-    db::DBClient,
+    database::DBClient,
     proto::{
         CreateEntityReq, CreateEntityResp, GetEntityReq, GetEntityResp,
         dummy_service_server::DummyService,

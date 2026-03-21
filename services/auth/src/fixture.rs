@@ -3,7 +3,7 @@
 use chrono::TimeZone;
 use uuid::Uuid;
 
-use crate::model::{OAuthAccount, Session};
+use crate::database::{OAuthAccount, Session};
 use crate::utils::hash_secret;
 
 pub fn fixture_uuid() -> Uuid {

@@ -1,13 +1,13 @@
 #![allow(dead_code)]
 pub(crate) mod create_session;
-pub(crate) mod db;
+pub(crate) mod database;
 pub(crate) mod delete_session;
 pub(crate) mod error;
 pub(crate) mod get_oauth_account;
 pub(crate) mod handle_oauth_callback;
 pub(crate) mod handler;
 pub(crate) mod link_oauth_account;
-pub(crate) mod model;
+
 pub(crate) mod oauth;
 #[allow(clippy::all)]
 pub(crate) mod proto;
@@ -19,7 +19,7 @@ pub(crate) mod validate_session;
 mod fixture;
 
 use crate::{
-    db::PostgresDBClient,
+    database::PostgresDBClient,
     handler::Handler,
     oauth::{config::OauthConfig, github::GithubOAuth, google::GoogleOAuth},
     proto::auth_service_server::AuthServiceServer,
@@ -35,9 +35,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let tracer = init_tracer(SERVICE_NAME)?;
 
-    let pg_cfg = database::PGConfig::from_env(SERVICE_NAME)?;
-    let pool = database::connect(&pg_cfg)?;
-    database::run_migrations!(pool, "./migrations");
+    let pg_cfg = ::database::PGConfig::from_env(SERVICE_NAME)?;
+    let pool = ::database::connect(&pg_cfg)?;
+    ::database::run_migrations!(pool, "./migrations");
 
     let oauth_cfg = OauthConfig::from_env();
     let handler = Handler::new(

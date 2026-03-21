@@ -1,7 +1,7 @@
 use tonic::{Request, Response, Status};
 
 use crate::{
-    db::DBClient,
+    database::DBClient,
     error::Error,
     handler::Handler,
     proto::{HandleOauthCallbackReq, HandleOauthCallbackResp, OauthProvider},

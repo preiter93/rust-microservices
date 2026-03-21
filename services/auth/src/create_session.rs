@@ -1,8 +1,7 @@
 use crate::{
-    db::DBClient,
+    database::{DBClient, Session},
     error::Error,
     handler::{Handler, SessionToken},
-    model::Session,
     proto::{CreateSessionReq, CreateSessionResp},
     utils::hash_secret,
 };
@@ -57,7 +56,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::db::test::MockDBClient;
+    use crate::database::MockDBClient;
     use crate::error::DBError;
     use crate::fixture::{fixture_token, fixture_uuid};
     use crate::oauth::{github::GithubOAuth, google::GoogleOAuth};
