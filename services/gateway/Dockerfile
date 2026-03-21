@@ -1,36 +1,35 @@
-# This file is generated. Do not edit directly.
+# Stage 1: Install workspace-cache tool
+FROM rust:1.94-bookworm AS base
+WORKDIR /app
+RUN cargo install workspace-cache@0.1.0-alpha.1
 
-FROM rust:1.88-bookworm AS chef
-WORKDIR /services
 
-# Install cargo-chef
-RUN cargo install --git https://github.com/preiter93/cargo-chef --branch workspace-filtering
-
-# Prepare dependency recipe
-FROM chef AS planner
+# Stage 2: Generate minimal workspace with stub sources
+FROM base AS planner
 COPY . .
-RUN cargo chef prepare --bin gateway --recipe-path recipe.json
+RUN workspace-cache deps --bin gateway --fast
 
-# Build the dependencies
-FROM chef AS builder
-COPY --from=planner /services/recipe.json recipe.json
-RUN cargo chef cook --release --recipe-path recipe.json --bin gateway
+# Stage 3: Build dependencies only (cached until Cargo.toml/Cargo.lock change)
+FROM base AS deps
+COPY --from=planner /app/.workspace-cache .
+RUN cargo build --release
 
-# Build the binary
-COPY ../.docker-gen/Cargo.toml.gateway Cargo.toml
-COPY ../Cargo.lock Cargo.lock
-COPY ../auth auth
-COPY ../gateway gateway
-COPY ../pkg/common pkg/common
-COPY ../pkg/database pkg/database
-COPY ../pkg/mock pkg/mock
-COPY ../pkg/oauth pkg/oauth
-COPY ../pkg/setup pkg/setup
-COPY ../pkg/testutils pkg/testutils
-COPY ../user user
+# Stage 4: Build the actual binary with real source code
+FROM deps AS builder
+RUN rm -rf auth/src pkg/common/src pkg/database/src pkg/oauth/src pkg/setup/src pkg/mock/src pkg/testutils/src gateway/src user/src
+COPY auth auth
+COPY pkg/common pkg/common
+COPY pkg/database pkg/database
+COPY pkg/oauth pkg/oauth
+COPY pkg/setup pkg/setup
+COPY pkg/mock pkg/mock
+COPY pkg/testutils pkg/testutils
+COPY gateway gateway
+COPY user user
+RUN cargo clean --release -p auth -p common -p database -p oauth -p setup -p mock -p testutils -p gateway -p user
 RUN cargo build --release --bin gateway
 
-# Run the service
+# Stage 5: Minimal runtime image
 FROM debian:bookworm-slim AS runtime
-COPY --from=builder /services/target/release/gateway /usr/local/bin/main
-ENTRYPOINT ["/usr/local/bin/main"]
+COPY --from=builder /app/target/release/gateway /usr/local/bin/gateway
+ENTRYPOINT ["/usr/local/bin/gateway"]
