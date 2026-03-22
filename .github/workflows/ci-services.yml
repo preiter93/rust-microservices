@@ -41,9 +41,13 @@ jobs:
         working-directory: services
 
     - name: Run tests
-      working-directory: services/${{ matrix.service }}
+      working-directory: services
+      env:
+        CARGO_TARGET_DIR: .workspace-cache/target
       run: cargo test --verbose
 
     - name: Clippy
-      working-directory: services/${{ matrix.service }}
+      working-directory: services
+      env:
+        CARGO_TARGET_DIR: .workspace-cache/target
       run: cargo clippy --workspace -- -D warnings
