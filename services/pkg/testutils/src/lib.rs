@@ -2,7 +2,8 @@ use deadpool_postgres::{Manager, ManagerConfig, Pool, RecyclingMethod, tokio_pos
 use refinery::Runner;
 use std::error::Error;
 use std::ops::DerefMut;
-use std::path::Path;
+use std::path::{Path, PathBuf};
+use std::{fs, process::Command};
 use testcontainers::ContainerAsync;
 use testcontainers::{
     GenericImage, ImageExt,
@@ -43,7 +44,7 @@ pub async fn get_test_db(
 /// terminated. That means test containers won’t be cleaned up
 /// automatically thus we explicitly stop the postgres container here.
 ///
-/// For more context, see:  
+/// For more context, see:
 /// <https://github.com/testcontainers/testcontainers-rs/issues/707>
 #[dtor::dtor]
 fn on_shutdown() {
@@ -72,10 +73,7 @@ async fn start_test_db(
             "database system is ready to accept connections",
         ))
         .with_network("shared_network")
-        .with_copy_to(
-            "/docker-entrypoint-initdb.d/init.sql",
-            include_bytes!("../../../../infrastructure/db/init.sql").to_vec(),
-        )
+        .with_copy_to("/docker-entrypoint-initdb.d/init.sql", read_init_sql())
         .with_env_var("PGPORT", pg_port.to_string())
         .with_env_var("POSTGRES_USER", "postgres")
         .with_env_var("POSTGRES_PASSWORD", "postgres")
@@ -121,6 +119,23 @@ async fn create_connection_pool(
     .map_err(|e| format!("failed to connect to db: {e}"))?;
 
     Ok(pool)
+}
+
+fn read_init_sql() -> Vec<u8> {
+    let git_root = Command::new("git")
+        .args(["rev-parse", "--show-toplevel"])
+        .output()
+        .expect("failed to run git rev-parse")
+        .stdout;
+    let git_root = String::from_utf8(git_root)
+        .expect("invalid utf8 from git")
+        .trim()
+        .to_string();
+    let path: PathBuf = [&git_root, "infrastructure", "db", "init.sql"]
+        .iter()
+        .collect();
+    fs::read(&path)
+        .unwrap_or_else(|e| panic!("failed to read init.sql at {}: {}", path.display(), e))
 }
 
 /// Asserts that a gRPC response matches the expected result.

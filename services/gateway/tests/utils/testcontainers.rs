@@ -1,4 +1,4 @@
-use std::{collections::HashMap, time::Duration};
+use std::{collections::HashMap, fs, path::PathBuf, time::Duration};
 use testcontainers::{ContainerAsync, GenericImage, ImageExt, core::WaitFor};
 use testcontainers::{core::ContainerPort, runners::AsyncRunner};
 use tokio::io::AsyncBufReadExt;
@@ -101,10 +101,7 @@ async fn run_postgres(pg_host: &str, pg_port: u16) -> ContainerAsync<GenericImag
         ))
         .with_network("shared_network")
         .with_container_name(format!("{pg_host}-integration-test"))
-        .with_copy_to(
-            "/docker-entrypoint-initdb.d/init.sql",
-            include_bytes!("../../../../infrastructure/db/init.sql").to_vec(),
-        )
+        .with_copy_to("/docker-entrypoint-initdb.d/init.sql", read_init_sql())
         .with_env_var("PGPORT", pg_port.to_string())
         .with_env_var("POSTGRES_USER", "postgres")
         .with_env_var("POSTGRES_PASSWORD", "postgres")
@@ -193,4 +190,21 @@ async fn read_startup_logs(container: &ContainerAsync<GenericImage>, service_nam
         }
     })
     .await;
+}
+
+fn read_init_sql() -> Vec<u8> {
+    let git_root = std::process::Command::new("git")
+        .args(["rev-parse", "--show-toplevel"])
+        .output()
+        .expect("failed to run git rev-parse")
+        .stdout;
+    let git_root = String::from_utf8(git_root)
+        .expect("invalid utf8 from git")
+        .trim()
+        .to_string();
+    let path: PathBuf = [&git_root, "infrastructure", "db", "init.sql"]
+        .iter()
+        .collect();
+    fs::read(&path)
+        .unwrap_or_else(|e| panic!("failed to read init.sql at {}: {}", path.display(), e))
 }

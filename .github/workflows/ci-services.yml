@@ -42,9 +42,9 @@ jobs:
         profile: debug
 
     - name: Run tests
-      working-directory: services/${{ matrix.service }}
-      run: cargo test --manifest-path ../.workspace-cache/Cargo.toml --verbose
+      working-directory: services/.workspace-cache
+      run: cargo test -p ${{ matrix.service }} --verbose
 
     - name: Clippy
-      working-directory: services/${{ matrix.service }}
-      run: cargo clippy --manifest-path ../.workspace-cache/Cargo.toml --workspace -- -D warnings
+      working-directory: services/.workspace-cache
+      run: cargo clippy -p ${{ matrix.service }} --workspace -- -D warnings
