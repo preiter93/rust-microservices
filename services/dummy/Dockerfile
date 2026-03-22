@@ -16,7 +16,7 @@ RUN cargo build --release
 
 # Stage 4: Build the actual binary with real source code
 FROM deps AS builder
-RUN rm -rf pkg/common/src pkg/database/src pkg/setup/src pkg/mock/src pkg/testutils/src dummy/src
+RUN rm -rf pkg/common pkg/database pkg/setup pkg/mock pkg/testutils dummy
 COPY pkg/common pkg/common
 COPY pkg/database pkg/database
 COPY pkg/setup pkg/setup
