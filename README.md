@@ -1,166 +1,173 @@
 # rust-svelte-setup
 
-This project is an exploration in creating a standard setup for a microservice backend using Rust. The main focus is on backend architecture, simple CRUD operations, no event-driven architecture. The focus is on simplicity, type safety and testability.
+This project explores creating a standard setup for a microservice backend using Rust. The focus is on backend architecture, simple CRUD operations (no event-driven architecture), with an emphasis on simplicity, type safety, and testability.
 
-# Architecture
+## Architecture
 
-## Overview
+### Overview
 
-This project is an base setup for a rust based microservice backend.
+This is a base setup for a Rust-based microservice backend.
 
-## Services
+### Services
 
-The backend consists of rust microservices. A clients request always reaches the `gateway` service where it is authenticated and forwarded to the respective microservice.
-The gateway exposes a restful http server (`axum`). Within the backend, the communication is done through `grpc` (`tonic`). Each microservices has its own protobuf file defining the service and models.
+The backend consists of Rust microservices. Client requests always reach the `gateway` service, where they are authenticated and forwarded to the respective microservice. The gateway exposes a RESTful HTTP server (`axum`). Within the backend, communication happens via `gRPC` (`tonic`). Each microservice has its own protobuf file defining its service and models.
 
-#### Microservice structure
+#### Microservice Structure
 
-Each microservice is focused on simple CRUD operations and uses a straightforward structure. The architecture decouples the database/repository layer from the service logic. If complexity grows, you can further split responsibilities (e.g., add a dedicated service layer for domain logic).
+Each microservice focuses on simple CRUD operations and uses a straightforward structure. The architecture decouples the database/repository layer from the service logic. If complexity grows, responsibilities can be further split (e.g., add a dedicated service layer for domain logic).
 
-A typical microservice (see [`dummy`](./services/dummy)) will have the following files:
-- `main.rs`: setup (read env variables, open db connection) and run the service
-- `lib.rs`: exposes service boundaries (such as `proto.rs`) for other microservices (see Microservice boundaries)
-- `server.rs`: implements the gRPC endpoints and service logic
-    - Each endpoint typically gets its own file (e.g., `get_entity.rs`)
-- `db.rs`: database/repository layer for CRUD operations
-- `proto.rs`: generated code from the protobuf definitions (does not need to be checked in git)
-- `utils.rs`: shared methods between endpoints, models, etc.
-- `error.rs`: error types for endpoints and database operations
-- `client.rs`: gRPC client implementation + service mocks (auto generated code)
+A typical microservice (see [`dummy`](./services/dummy)) has the following structure:
+- `main.rs` – setup (environment variables, database connection) and service startup
+- `lib.rs` – exposes service boundaries (such as `proto.rs`) for other microservices
+- `handler.rs` – implements gRPC endpoints and service logic
+  - Each endpoint typically gets its own file (e.g., `get_entity.rs`)
+- `database/` – database/repository layer for CRUD operations
+- `proto.rs` – generated code from protobuf definitions (not checked into git)
+- `utils.rs` – shared methods between endpoints, models, etc.
+- `error.rs` – error types for endpoints and database operations
+- `client.rs` – gRPC client implementation + service mocks (auto-generated)
 
-See also [Master hexagonal architecture in Rust](https://www.howtocodeit.com/articles/master-hexagonal-architecture-rust).
+See also: [Master hexagonal architecture in Rust](https://www.howtocodeit.com/articles/master-hexagonal-architecture-rust)
 
-#### Microservice boundaries (`lib.rs`)
+#### Microservice Boundaries (`lib.rs`)
 
-Microservices must have access to the api layer of other microservices, which means they must have access to the proto generated client and request/response messages of other microservices. This may be solve by - compiling the protos in a common `proto` library and including the common library in the microservice, or - compiling the proto that belongs to the service as part of the service and exposing it in `lib.rs`.
-This setup uses the second solution. It avoids introducing a shared `proto` library and additionally each service can define which part of the proto it wants to expose. Note: the `lib.rs` should not expose more than needed by other service, so usually it only exposes the full or parts of the `proto.rs`.
+Microservices need access to the API layer of other microservices—specifically the proto-generated client and request/response messages. This can be solved by:
+1. Compiling protos in a common `proto` library and including it in each microservice, or
+2. Compiling protos as part of each service and exposing them via `lib.rs`
+
+This setup uses the second approach. It avoids introducing a shared `proto` library, and each service can define which parts of the proto to expose. Note: `lib.rs` should only expose what's needed by other services—typically just the full or partial `proto.rs`.
 
 #### Database
 
-I use `tokio-postgres` for database access. I tried `sqlx` with compiled sql statements, but found it caused more problems than it solved for me. To me a plain uncompiled sql statement with good unit testing is the way to go. And `deadpool-postgres` for connection pooling.
+This project uses `tokio-postgres` for database access. `sqlx` with compiled SQL statements was tried but caused more problems than it solved. Plain SQL with good unit testing is the way to go. Connection pooling is handled by `deadpool-postgres`.
 
-#### Shared dependencies (`workspace`)
+#### Shared Dependencies (Workspace)
 
-Microservices have a lot of dependencies in common, such as tonic, prost, tokio, serde etc. This may lead to a drift in dependency versions, where microservice a depends on a different version of package x than microservice b. The solution is to put all microservices in a `workspace` and define the share dependencies as a workspace dependency.
+Microservices share many dependencies (tonic, prost, tokio, serde, etc.), which can lead to version drift between services. The solution is to put all microservices in a `workspace` and define shared dependencies as workspace dependencies.
 
-#### Deployment of microservices
+### Deployment
 
-#### Deploy a single microservice (`docker`)
+#### Docker Builds with workspace-cache
 
-The `Dockerfile` for each microservice is autogenerated using the [`tools/docker-gen`](./tools/docker-gen) script. This approach ensures that the Dockerfile only includes the microservice itself and the code from any services or packages it depends on. This is critical for optimal caching, especially when using `cargo-chef` to separate dependency compilation from service code builds.
+The `Dockerfile` for each microservice is auto-generated using [`workspace-cache`](https://github.com/preiter93/workspace-cache), a tool built specifically for this purpose. It analyzes workspace dependencies and generates optimal Dockerfiles that include only the microservice itself and its actual dependencies.
 
-All microservices of the backend are deployed together with docker compose.
-
-#### Cache external dependencies between docker builds (`cargo-chef`)
-
-This setup uses `cargo-chef` to split the build into two steps:
+This approach uses a two-stage build:
 1. Compile all external dependencies (which change rarely)
 2. Compile the microservice's actual binary
 
-This separation allows Docker to cache the dependency layer, so rebuilding is much faster when only your service code changes.
+This separation allows Docker to cache the dependency layer, making rebuilds much faster when only service code changes. Unlike `cargo-chef`, `workspace-cache` is designed specifically for workspaces and generates minimal, optimized Dockerfiles automatically.
 
-I use a custom version of `cargo-chef` (not the main release), because of a fix I contributed ([PR #324](https://github.com/LukeMathWalker/cargo-chef/pull/324)) that minimizes the recipe for workspaces. With this fix, a workspace member (microservice or package) will only rebuild if one of its dependencies changes, instead of rebuilding too often as before.
+All backend microservices are deployed together with Docker Compose.
 
-#### Alternative docker strategy
+#### Alternative Docker Strategy
 
-At the moment I build the binary within the docker build process. For Rust images this can be very slow. I put a lot of effor into caching everything optimally and reduce this time, but if a central dependency changes this can be a pain.An alternative would be to build the binary outside of docker and copy the binary into a minimal docker image (e.g., `scratch` or `alpine`). If I am honest, this sounds like the more scalable approach. But my software engineering pride resisted that idea in the beginning, there is something more elegant about building everything within docker.
+Currently, binaries are built within the Docker build process. For Rust images this can be slow. Significant effort has gone into optimal caching, but if a central dependency changes, it can still be painful.
 
-## Authentication
+An alternative is building binaries outside Docker and copying them into a minimal image (e.g., `scratch` or `alpine`). This is arguably more scalable—but there's something elegant about building everything within Docker.
 
-Authentication is hand-rolled using information from [lucia](https://lucia-auth.com/) and implements oauth login with google and gitHub. **This is not production-grade security. I'm not a security expert. Do really not use this for your super private production app!**
+### Authentication
 
-## Protos
+Authentication is hand-rolled using information from [lucia](https://lucia-auth.com/) and implements OAuth login with Google and GitHub.
 
-Communication in the backend is done via `gRPC`. `proto` files are compiled into rust and typescript code, thus the backend can share request/response models with the frontend.
+**⚠️ This is not production-grade security. Do not use this for production apps!**
 
-## Routing
+### Protos
 
-I use **Traefik** as a reverse proxy to route requests to the backend or the frontend. Setting it up was straightforward, at least I dont remember any major issues.
+Backend communication uses `gRPC`. Proto files are compiled into both Rust and TypeScript code, allowing the backend to share request/response models with the frontend.
 
-## Testing
+### Routing
 
-#### Unit tests
+**Traefik** serves as a reverse proxy to route requests to the backend or frontend. Setup is straightforward.
 
-For unit tests I use [`rstest`](https://github.com/la10736/rstest) for table-driven testing. This makes it easy to cover multiple scenarios.
+### Testing
 
-#### Database unit tests
+#### Unit Tests
 
-Database unit tests use [`testcontainers`](https://docs.rs/testcontainers/latest/testcontainers/) to spin up a real postgres database.
+Unit tests use [`rstest`](https://github.com/la10736/rstest) for table-driven testing, making it easy to cover multiple scenarios.
 
-#### Integration tests
+#### Database Tests
 
-Integration tests also use `testcontainers` to spin up all required services. These tests are located in [`services/gateway/tests`](./services/gateway/tests) and check the interactions between microservices in a realistic environment.
+Database tests use [`testcontainers`](https://docs.rs/testcontainers/latest/testcontainers/) to spin up a real Postgres database.
 
-## Tracing
+#### Integration Tests
 
-I use **OpenTelemetry** to instrument and collect traces. The traces are sent to **Jaeger** by default, but this can
-be swapped with other **OpenTelemetry** compatible backends.
+Integration tests also use `testcontainers` to spin up all required services. These tests live in [`services/gateway/tests`](./services/gateway/tests) and verify interactions between microservices in a realistic environment.
 
-#### Inter-service tracing
+### Tracing
 
-Traces are propagated between microservices
-- Sending: Interceptors inject/extract context and add a `trace_id`.
-- Receiving: Middleware picks up the context and records the `trace_id`.
+**OpenTelemetry** instruments and collects traces. Traces are sent to **Jaeger** by default, but this can be swapped with any OpenTelemetry-compatible backend.
 
-### Further Reading
+#### Inter-Service Tracing
+
+Traces propagate between microservices:
+- **Sending:** Interceptors inject/extract context and add a `trace_id`
+- **Receiving:** Middleware picks up the context and records the `trace_id`
+
+#### Further Reading
 
 - [Logging basics](https://heikoseeberger.de/2023-07-29-dist-tracing-1/)
 - [Tracing in a single service](https://heikoseeberger.de/2023-08-18-dist-tracing-2/)
 - [Inter-service tracing](https://heikoseeberger.de/2023-08-28-dist-tracing-3/)
 
-# How to run
+## How to Run
 
-1. Copy `.env.example` to `.env` and adjust as needed.
+1. Copy `.env.example` to `.env` and adjust as needed
+
 2. Generate code and Dockerfiles:
-   ```
+   ```sh
    just generate
    ```
+
 3. Build and deploy the backend:
-   ```
+   ```sh
    just build-services
-   just create-network
    just deploy
    ```
-4. To run the app locally (in the `app` directory):
-   ```
+
+4. Run the app locally (in the `app` directory):
+   ```sh
    npm run dev -- --open
    ```
+   
    Or build and deploy the app:
-   ```
+   ```sh
    just build-app
    just deploy-app
    ```
 
-Do I promise this works flawlessly? No. There might be the one or other steps you have to do manually. Feel free to let me know.
+This may not work flawlessly out of the box. There might be manual steps required. Feel free to open an issue if you run into problems.
 
-# How does it compare to go?
+## How Does It Compare to Go?
 
-The tldr is: for large software projects I’d still choose go for the majority of services, but I’d definitely consider Rust for performance-critical parts (see this good read: https://engineering.grab.com/counter-service-how-we-rewrote-it-in-rust). And I just prefer writing Rust.
+**TL;DR:** For large software projects, Go remains a solid choice for the majority of services, but Rust is worth considering for performance-critical parts (see: [How Grab rewrote their counter service in Rust](https://engineering.grab.com/counter-service-how-we-rewrote-it-in-rust)).
 
-**Why Rust:**
-- Type safety. In Go it’s easy to forget passing values to structs and let’s be honest, who creates explicit constructors for everything?
-- Performance: blazingly fast. But have I benchmarked? No. And does it matter for my app with 1 user (me)? Not really. But it is nice to know once it matters, Rust is the right tool.
-- Nil pointer exception: In Go it’s just a tad too easy to get a nil pointer exception and crash your microservice. Want to access a nested proto struct but haven’t checked the parent for nil? Boom...
-- Compile time features: As an example, it is nice to use rusts features to put shared testutils in a service. In Go, it’s not straightforward to share testutils without polluting the public API between services.
-- Error handling: I don’t mind Go’s verbosity, but Rust's approach feels nicer, and with `anyhow` and `thiserror` it also as a better ecosystem in my opinion.
-- No garbage collection: Just one problem less to care for.
-- And I just like the language more than Go.
+### Why Rust
 
-**The negatives:**
-- Compile time. Rebuilding a full service from scratch in Docker on a mac can take up to 10 minutes. Want to parallelize this over 10 microservices? Your memory is killed. I put a lot of effort into optimizing caching, using cargo-chef, fixing cargo-chef, autogenerating optimal Dockerfiles (see architecture). But here Go just wins. Maybe I just need to crank some compiler flags in Rust to make it bearable?
-- Table testing is a bit cumbersome in Rust. I use rstest and really like it, but it’s macro-based, which always breaks my formatting in nvim...
-- gRPC gateway: I thought this was a standard gRPC thing. Was surprised Rust doesn’t have a good gRPC gateway. Maybe tonic adds one at some point? (https://github.com/hyperium/tonic/issues/332)
-- HTTP/gRPC middleware: Took me quite some time to write gRPC middleware in Rust. That’s a lot easier in Go, but once you figure out the Rust/tower way, it’s kinda fun.
-- I like how easy it is to onboard new people in Go while in Rust I’d probably spend days explaining generics, lifetimes, async traits and would fumble most of the explanations. What's that Pin thing again?
-- The test harness in Go is so much simpler if you want to do some pre/post setup for all tests. For example in database tests I want to spin up a single postgres container for all tests and then destroy it afterwards. Thats straightforward in Go, but in Rust I really struggled and only managed with a whacky approach that kills the docker containers with a system call. I am not the only one with this problem: [Single container start for whole integration test file](https://github.com/testcontainers/testcontainers-rs/issues/707).
+- **Type safety** – In Go it's easy to forget passing values to structs. Who creates explicit constructors for everything?
+- **Performance** – Blazingly fast. Does it matter for an app with 1 user? Not really. But it's nice to know Rust is the right tool when it matters.
+- **No nil pointer exceptions** – In Go it's too easy to get a nil pointer exception and crash a service. Accessing a nested proto struct without checking the parent for nil? Boom.
+- **Compile-time features** – For example, using Rust's features to put shared test utilities in a service. In Go, sharing test utilities without polluting the public API isn't straightforward.
+- **Error handling** – Go's verbosity is fine, but Rust's approach feels nicer. With `anyhow` and `thiserror`, the ecosystem is better too.
+- **No garbage collection** – One less thing to worry about.
 
-# Where is it used so far?
+### The Downsides
 
-A backend with a similar setup to this one powers my personal website for tracking running data: [runaround.world](https://runaround.world) (feel free to give it a try, but its early stage - it only supports data from polar and strava at the moment). It works really well. Rust + Postgres delivers the performance you'd expect and in practice there's no need to optimize beyond just writing sane Rust code. So don't worry about a few clones here and there. I like the type safety that Rust provides, there are rarely any issues that I have to debug after it compiles. And if there are issues, tracing helps to track them down quickly.
+- **Compile time** – Rebuilding a full service from scratch in Docker on a Mac can take up to 10 minutes. Want to parallelize across 10 microservices? Memory gets killed. Significant effort has gone into caching optimization with `workspace-cache` and auto-generated Dockerfiles, but Go just wins here.
+- **Table testing** – A bit cumbersome in Rust. rstest is great, but it's macro-based, which can break formatting in editors.
+- **No gRPC gateway** – Surprisingly, Rust doesn't have a good gRPC gateway. Maybe tonic will add one? ([Issue #332](https://github.com/hyperium/tonic/issues/332))
+- **HTTP/gRPC middleware** – Writing gRPC middleware in Rust takes time. Much easier in Go, but once the tower way clicks, it's actually fun.
+- **Onboarding** – Go onboarding is easy. Rust requires explaining generics, lifetimes, and async traits. What's that `Pin` thing again?
+- **Test harness** – Go's test harness is much simpler for pre/post setup. For database tests, spinning up one Postgres container for all tests and destroying it afterward is straightforward in Go. In Rust, this requires workarounds: [testcontainers-rs issue #707](https://github.com/testcontainers/testcontainers-rs/issues/707).
 
-# Similar Projects
+## Where Is It Used?
 
-There are a few similar projects from which I drew inspiration, however there weren't as many as I expected. Here are some of them:
+A backend with a similar setup powers [runaround.world](https://runaround.world), a personal website for tracking running data. Feel free to try it—but it's early stage and only supports Polar and Strava data at the moment.
+
+It works really well. Rust + Postgres delivers the expected performance, and in practice there's no need to optimize beyond writing sane Rust code. Don't worry about a few `.clone()` calls here and there. The type safety Rust provides means issues after compilation are rare. When they do occur, tracing helps track them down quickly.
+
+## Similar Projects
+
+A few similar projects that provided inspiration:
 
 - [rusve](https://github.com/mpiorowski/rusve)
 - [rust-microservice-template](https://github.com/nkz-soft/rust-microservice-template)
