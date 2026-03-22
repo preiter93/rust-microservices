@@ -39,15 +39,16 @@ jobs:
       with:
         binary: ${{ matrix.service }}
         working-directory: services
+        profile: debug
 
     - name: Run tests
       working-directory: services
       env:
         CARGO_TARGET_DIR: .workspace-cache/target
-      run: cargo test --verbose
+      run: cargo test -p ${{ matrix.service }} --verbose
 
     - name: Clippy
       working-directory: services
       env:
         CARGO_TARGET_DIR: .workspace-cache/target
-      run: cargo clippy --workspace -- -D warnings
+      run: cargo clippy -p ${{ matrix.service }} --workspace -- -D warnings
