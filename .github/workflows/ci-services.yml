@@ -1,4 +1,3 @@
-# TODO: Discover services
 # TODO: Run integration tests
 name: Continuous Integration - Services
 
@@ -17,6 +16,7 @@ jobs:
 
     strategy:
       matrix:
+        # TODO: Discover services
         service:
           - auth
           - user
@@ -31,20 +31,14 @@ jobs:
       with:
         components: clippy
 
-    - name: Cache Cargo registry and build
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.cargo/registry
-          ~/.cargo/git
-          services/target
-        key: ${{ runner.os }}-cargo-${{ matrix.service }}-${{ hashFiles('services/Cargo.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-cargo-${{ matrix.service }}-
+    - name: Install workspace-cache
+      uses: preiter93/workspace-cache/.github/actions/install-workspace-cache@main
 
     - name: Build
-      working-directory: services/${{ matrix.service }}
-      run: cargo build --verbose
+      uses: preiter93/workspace-cache/.github/actions/build-workspace@main
+      with:
+        binary: ${{ matrix.service }}
+        working-directory: services
 
     - name: Run tests
       working-directory: services/${{ matrix.service }}
