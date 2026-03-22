@@ -1,4 +1,4 @@
-# rust-svelte-setup
+# rust-microservices
 
 This project explores creating a standard setup for a microservice backend using Rust. The focus is on backend architecture, simple CRUD operations (no event-driven architecture), with an emphasis on simplicity, type safety, and testability.
 
@@ -39,7 +39,7 @@ This setup uses the second approach. It avoids introducing a shared `proto` libr
 
 #### Database
 
-This project uses `tokio-postgres` for database access. `sqlx` with compiled SQL statements was tried but caused more problems than it solved. Plain SQL with good unit testing is the way to go. Connection pooling is handled by `deadpool-postgres`.
+This project uses `tokio-postgres` for database access. `sqlx` with compiled SQL statements was tried but caused more problems than it solved. Plain SQL with good unit testing is sufficient. Connection pooling is handled by `deadpool-postgres`.
 
 #### Shared Dependencies (Workspace)
 
@@ -61,15 +61,15 @@ All backend microservices are deployed together with Docker Compose.
 
 #### Alternative Docker Strategy
 
-Currently, binaries are built within the Docker build process. For Rust images this can be slow. Significant effort has gone into optimal caching, but if a central dependency changes, it can still be painful.
+Currently, binaries are built within the Docker build process. For Rust images this can be slow. Significant effort has gone into optimal caching, but if a central dependency changes, it can still take a while to rebuild all images.
 
 An alternative is building binaries outside Docker and copying them into a minimal image (e.g., `scratch` or `alpine`). This is arguably more scalable—but there's something elegant about building everything within Docker.
 
 ### Authentication
 
-Authentication is hand-rolled using information from [lucia](https://lucia-auth.com/) and implements OAuth login with Google and GitHub.
+Authentication is hand-rolled using the documentation from [lucia](https://lucia-auth.com/) and implements OAuth login with Google and GitHub.
 
-**⚠️ This is not production-grade security. Do not use this for production apps!**
+**⚠️This may not be production-grade security. Do not use this blindly for your production apps!**
 
 ### Protos
 
@@ -144,8 +144,8 @@ This may not work flawlessly out of the box. There might be manual steps require
 ### Why Rust
 
 - **Type safety** – In Go it's easy to forget passing values to structs. Who creates explicit constructors for everything?
-- **Performance** – Blazingly fast. Does it matter for an app with 1 user? Not really. But it's nice to know Rust is the right tool when it matters.
-- **No nil pointer exceptions** – In Go it's too easy to get a nil pointer exception and crash a service. Accessing a nested proto struct without checking the parent for nil? Boom.
+- **Performance** – Rust s fast. Does it matter for an app with a handful of user? Not really. But it's nice to know Rust is the right tool when it matters.
+- **Nil pointer exceptions** – In Go it's too easy to get a nil pointer exception and crash a service. Accessing a nested proto struct without checking the parent for nil? Crash.
 - **Compile-time features** – For example, using Rust's features to put shared test utilities in a service. In Go, sharing test utilities without polluting the public API isn't straightforward.
 - **Error handling** – Go's verbosity is fine, but Rust's approach feels nicer. With `anyhow` and `thiserror`, the ecosystem is better too.
 - **No garbage collection** – One less thing to worry about.
