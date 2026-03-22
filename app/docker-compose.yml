@@ -1,5 +1,6 @@
 services:
   svelte:
+    env_file: ../.env
     build: .
     container_name: svelte
     restart: always

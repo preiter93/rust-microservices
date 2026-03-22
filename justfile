@@ -6,41 +6,42 @@ default:
 # Build all backend services
 [group: "build"]
 build-services:
-  docker compose --env-file .env -f services/docker-compose.yml build
+  docker compose -f services/docker-compose.yml build
 
 # Builds a single backend service
 [group: "build"]
 build-service target:
-  docker compose --env-file .env -f services/docker-compose.yml build {{ target }}
+  docker compose -f services/docker-compose.yml build {{ target }}
 
 # Build backend services synchronously
 [group: "build"]
 build-services-sync:
-  docker compose --env-file .env -f services/docker-compose.yml build gateway
-  docker compose --env-file .env -f services/docker-compose.yml build user
-  docker compose --env-file .env -f services/docker-compose.yml build auth
+  docker compose -f services/docker-compose.yml build gateway
+  docker compose -f services/docker-compose.yml build user
+  docker compose -f services/docker-compose.yml build auth
 
 # Deploy all services
 [group: "deploy"]
 deploy-services:
-  docker compose --env-file .env -f services/docker-compose.yml up -d
+  docker compose -f services/docker-compose.yml up -d
 
 # Undeploy all services
 [group: "deploy"]
 undeploy-services:
-  docker compose --env-file .env -f services/docker-compose.yml down
+  docker compose -f services/docker-compose.yml down
 
 # Deploy the full system (DB, services, Jaeger, Traefik)
 [group: "deploy"]
 deploy:
+  docker network create shared_network 2>/dev/null || true
   echo "Starting DB..."
-  docker compose --env-file .env -f infrastructure/db/docker-compose.yml up -d
+  docker compose -f infrastructure/db/docker-compose.yml up -d
 
   echo "Waiting for DB to initialize..."
   sleep 5
 
   echo "Starting backend services..."
-  docker compose --env-file .env -f services/docker-compose.yml up -d
+  docker compose -f services/docker-compose.yml up -d
 
   echo "Starting Traefik..."
   docker compose -f infrastructure/traefik/docker-compose.yml up -d
@@ -75,12 +76,12 @@ create-network:
 # Build the app
 [group: "build"]
 build-app:
-  docker compose --env-file .env -f app/docker-compose.yml build
+  docker compose -f app/docker-compose.yml build
 
 # Deploy the app
 [group: "deploy"]
 deploy-app:
-  docker compose --env-file .env -f app/docker-compose.yml up -d
+  docker compose -f app/docker-compose.yml up -d
 
 # Undeploy the app
 [group: "deploy"]

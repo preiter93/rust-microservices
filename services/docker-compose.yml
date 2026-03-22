@@ -16,7 +16,7 @@ services:
       - shared_network
 
   auth:
-    env_file: .env
+    env_file: ../.env
     restart: unless-stopped
     build:
       context: .
@@ -31,7 +31,7 @@ services:
       - shared_network
 
   user:
-    env_file: .env
+    env_file: ../.env
     restart: unless-stopped
     build:
       context: .
