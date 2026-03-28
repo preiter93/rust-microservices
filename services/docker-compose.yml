@@ -2,6 +2,7 @@ version: "3.9"
 
 services:
   gateway:
+    env_file: ../.env
     restart: unless-stopped
     build:
       context: .

@@ -23,6 +23,11 @@ This project explores creating a standard setup for a microservice backend using
    ```
 
 > This may not work flawlessly out of the box. There might be manual steps required. Feel free to open an issue.
+
+**Connecting to the database:**
+```sh
+docker exec -it db-db-1 psql -U postgres -d user_db
+```
 ## Architecture
 
 ### Overview
