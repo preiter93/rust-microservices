@@ -2,6 +2,27 @@
 
 This project explores creating a standard setup for a microservice backend using Rust. The focus is on backend architecture, simple CRUD operations (no event-driven architecture), with an emphasis on simplicity, type safety, and testability.
 
+## Getting Started
+
+1. Copy `.env.example` to `.env` and adjust as needed
+
+2. Start infrastructure (database, Traefik, Jaeger):
+   ```sh
+   just deploy-infrastructure
+   ```
+
+3. Build and deploy backend services:
+   ```sh
+   just build-services
+   just deploy-services
+   ```
+
+4. Run the frontend locally:
+   ```sh
+   cd app && npm run dev -- --open
+   ```
+
+> This may not work flawlessly out of the box. There might be manual steps required. Feel free to open an issue.
 ## Architecture
 
 ### Overview
@@ -108,34 +129,6 @@ Traces propagate between microservices:
 - [Logging basics](https://heikoseeberger.de/2023-07-29-dist-tracing-1/)
 - [Tracing in a single service](https://heikoseeberger.de/2023-08-18-dist-tracing-2/)
 - [Inter-service tracing](https://heikoseeberger.de/2023-08-28-dist-tracing-3/)
-
-## How to Run
-
-1. Copy `.env.example` to `.env` and adjust as needed
-
-2. Generate code and Dockerfiles:
-   ```sh
-   just generate
-   ```
-
-3. Build and deploy the backend:
-   ```sh
-   just build-services
-   just deploy
-   ```
-
-4. Run the app locally (in the `app` directory):
-   ```sh
-   npm run dev -- --open
-   ```
-   
-   Or build and deploy the app:
-   ```sh
-   just build-app
-   just deploy-app
-   ```
-
-This may not work flawlessly out of the box. There might be manual steps required. Feel free to open an issue if you run into problems.
 
 ## How Does It Compare to Go?
 

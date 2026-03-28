@@ -20,63 +20,43 @@ build-services-sync:
   docker compose -f services/docker-compose.yml build user
   docker compose -f services/docker-compose.yml build auth
 
-# Deploy all services
-[group: "deploy"]
-deploy-services:
-  docker compose -f services/docker-compose.yml up -d
-
-# Undeploy all services
-[group: "deploy"]
-undeploy-services:
-  docker compose -f services/docker-compose.yml down
-
-# Deploy the full system (DB, services, Jaeger, Traefik)
-[group: "deploy"]
-deploy:
-  docker network create shared_network 2>/dev/null || true
-  echo "Starting DB..."
-  docker compose -f infrastructure/db/docker-compose.yml up -d
-
-  echo "Waiting for DB to initialize..."
-  sleep 5
-
-  echo "Starting backend services..."
-  docker compose -f services/docker-compose.yml up -d
-
-  echo "Starting Traefik..."
-  docker compose -f infrastructure/traefik/docker-compose.yml up -d
-
-  echo "Starting Jaeger..."
-  docker compose -f infrastructure/jaeger/docker-compose.yml up -d
-
-  echo "Deployment complete!"
-
-# Undeploys the full system (DB, services, Jaeger, Traefik)
-[group: "deploy"]
-undeploy:
-  echo "Stopping Jaeger..."
-  docker compose -f infrastructure/jaeger/docker-compose.yml down
-
-  echo "Stopping Traefik..."
-  docker compose -f infrastructure/traefik/docker-compose.yml down
-
-  echo "Stopping services..."
-  docker compose -f services/docker-compose.yml down
-
-  echo "Stopping DB..."
-  docker compose -f infrastructure/db/docker-compose.yml down
-
-  echo "Undeployment complete!"
-
-# Creates the docker network
-[group: "deploy"]
-create-network:
-  docker network create shared_network
-
 # Build the app
 [group: "build"]
 build-app:
   docker compose -f app/docker-compose.yml build
+
+# Deploy infrastructure (network, DB, Traefik, Jaeger)
+[group: "deploy"]
+deploy-infrastructure:
+  docker network create shared_network 2>/dev/null || true
+  echo "Starting DB..."
+  docker compose -f infrastructure/db/docker-compose.yml up -d
+  echo "Starting Traefik..."
+  docker compose -f infrastructure/traefik/docker-compose.yml up -d
+  echo "Starting Jaeger..."
+  docker compose -f infrastructure/jaeger/docker-compose.yml up -d
+  echo "Infrastructure deployed!"
+
+# Undeploy infrastructure (Jaeger, Traefik, DB, network)
+[group: "deploy"]
+undeploy-infrastructure:
+  echo "Stopping Jaeger..."
+  docker compose -f infrastructure/jaeger/docker-compose.yml down
+  echo "Stopping Traefik..."
+  docker compose -f infrastructure/traefik/docker-compose.yml down
+  echo "Stopping DB..."
+  docker compose -f infrastructure/db/docker-compose.yml down
+  echo "Infrastructure undeployed!"
+
+# Deploy all backend services
+[group: "deploy"]
+deploy-services:
+  docker compose -f services/docker-compose.yml up -d
+
+# Undeploy all backend services
+[group: "deploy"]
+undeploy-services:
+  docker compose -f services/docker-compose.yml down
 
 # Deploy the app
 [group: "deploy"]
@@ -86,7 +66,7 @@ deploy-app:
 # Undeploy the app
 [group: "deploy"]
 undeploy-app:
-  docker compose --env-file .env -f app/docker-compose.yml down
+  docker compose -f app/docker-compose.yml down
 
 # Generate rust protobuf files
 [working-directory: 'services']
@@ -101,7 +81,7 @@ generate-protos-rs:
     fi
   done
 
-# Generate rust protobuf files
+# Generate Dockerfiles for all services
 [working-directory: 'services']
 [group: "generate"]
 generate-dockerfile:
@@ -124,6 +104,6 @@ generate-protos-ts:
 [group: "generate"]
 generate-protos: generate-protos-rs generate-protos-ts
 
-# Generate protbuf files and dockerfiles
+# Generate protobuf files and Dockerfiles
 [group: "generate"]
 generate: generate-protos-ts generate-protos-rs generate-dockerfile
