@@ -47,15 +47,7 @@
             buf
           ];
 
-          shellHook = ''
-            echo "🦀 Rust microservices development environment"
-            echo "Rust: $(rustc --version)"
-            echo "Node: $(node --version)"
-            echo "Just: $(just --version)"
-            echo "Docker Compose: $(docker-compose --version)"
-            echo ""
-            echo "Run 'just' to see available commands"
-          '';
+          shellHook = '''';
 
           # Environment variables
           RUST_BACKTRACE = "1";
