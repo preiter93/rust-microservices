@@ -1,8 +1,10 @@
 # rust-microservices
 
-This project explores creating a standard setup for a microservice backend using Rust. The focus is on backend architecture, simple CRUD operations (no event-driven architecture), with an emphasis on simplicity, type safety, and testability.
+This project explores creating a standard setup for a microservice backend using Rust.
 
 ## Getting Started
+
+**Prerequisites:** This project uses [Nix](https://nixos.org/) to manage development dependencies (Rust, Node.js, just, etc.) and [direnv](https://direnv.net/) for automatic shell setup.
 
 1. Copy `.env.example` to `.env` and adjust as needed
 
@@ -22,17 +24,11 @@ This project explores creating a standard setup for a microservice backend using
    cd app && npm run dev -- --open
    ```
 
-> This may not work flawlessly out of the box. There might be manual steps required. Feel free to open an issue.
-
 **Connecting to the database:**
 ```sh
 docker exec -it db-db-1 psql -U postgres -d user_db
 ```
 ## Architecture
-
-### Overview
-
-This is a base setup for a Rust-based microservice backend.
 
 ### Services
 
@@ -95,7 +91,7 @@ An alternative is building binaries outside Docker and copying them into a minim
 
 Authentication is hand-rolled using the documentation from [lucia](https://lucia-auth.com/) and implements OAuth login with Google and GitHub.
 
-**⚠️This may not be production-grade security. Do not use this blindly for your production apps!**
+**⚠️Do not use this without audit on production!**
 
 ### Protos
 
@@ -137,25 +133,24 @@ Traces propagate between microservices:
 
 ## How Does It Compare to Go?
 
-**TL;DR:** For large software projects, Go remains a solid choice for the majority of services, but Rust is worth considering for performance-critical parts (see: [How Grab rewrote their counter service in Rust](https://engineering.grab.com/counter-service-how-we-rewrote-it-in-rust)).
+**TL;DR:** For large software projects, go is a great choice for the majority of services, but Rust is worth considering for performance-critical parts (see: [How Grab rewrote their counter service in Rust](https://engineering.grab.com/counter-service-how-we-rewrote-it-in-rust)).
 
 ### Why Rust
 
 - **Type safety** – In Go it's easy to forget passing values to structs. Who creates explicit constructors for everything?
-- **Performance** – Rust s fast. Does it matter for an app with a handful of user? Not really. But it's nice to know Rust is the right tool when it matters.
+- **Performance** – Rust is fast. Does it matter for an app with a handful of user? Not really. But it's nice to know Rust is the right tool when it matters.
 - **Nil pointer exceptions** – In Go it's too easy to get a nil pointer exception and crash a service. Accessing a nested proto struct without checking the parent for nil? Crash.
-- **Compile-time features** – For example, using Rust's features to put shared test utilities in a service. In Go, sharing test utilities without polluting the public API isn't straightforward.
+- **Compile-time features** – For example, using Rust's features to put shared test utilities in a service that are only compiled when testing. In Go, sharing test utilities without polluting the public API isn't straightforward.
 - **Error handling** – Go's verbosity is fine, but Rust's approach feels nicer. With `anyhow` and `thiserror`, the ecosystem is better too.
 - **No garbage collection** – One less thing to worry about.
 
 ### The Downsides
 
-- **Compile time** – Rebuilding a full service from scratch in Docker on a Mac can take up to 10 minutes. Want to parallelize across 10 microservices? Memory gets killed. Significant effort has gone into caching optimization with `workspace-cache` and auto-generated Dockerfiles, but Go just wins here.
-- **Table testing** – A bit cumbersome in Rust. rstest is great, but it's macro-based, which can break formatting in editors.
+- **Compile time** – Rebuilding a full service from scratch in Docker on a Mac can take up to 10 minutes. And parallelizing this requires a lot of memory. Significant effort has gone into caching optimization with `workspace-cache` and auto-generated Dockerfiles, but Go wins here.
+- **Table testing** – A bit cumbersome in Rust. rstest is great, but it's macro-based, which can break formatting in editors. On the flip side, it forces you to write simpler tests with proper use of fixtures.
 - **No gRPC gateway** – Surprisingly, Rust doesn't have a good gRPC gateway. Maybe tonic will add one? ([Issue #332](https://github.com/hyperium/tonic/issues/332))
-- **HTTP/gRPC middleware** – Writing gRPC middleware in Rust takes time. Much easier in Go, but once the tower way clicks, it's actually fun.
-- **Onboarding** – Go onboarding is easy. Rust requires explaining generics, lifetimes, and async traits. What's that `Pin` thing again?
-- **Test harness** – Go's test harness is much simpler for pre/post setup. For database tests, spinning up one Postgres container for all tests and destroying it afterward is straightforward in Go. In Rust, this requires workarounds: [testcontainers-rs issue #707](https://github.com/testcontainers/testcontainers-rs/issues/707).
+- **HTTP/gRPC middleware** – Understanding gRPC middleware in Rust takes some time. It is easier in Go, but once the Rust/tower way clicks, it's actually straightforward.
+- **Pre/post testing hooks** – Rust's test harness does not really have support for pre/post testing hooks. For database tests, spinning up one Postgres container for all tests and destroying it afterward is straightforward in Go, whereas in Rust this requires workarounds: [testcontainers-rs issue #707](https://github.com/testcontainers/testcontainers-rs/issues/707).
 
 ## Where Is It Used?
 
