@@ -68,6 +68,29 @@ deploy-app:
 undeploy-app:
   docker compose -f app/docker-compose.yml down
 
+# Undeploys the full system with volumes (DB, services, Jaeger, Traefik)
+[group: "deploy"]
+nuke:
+  @echo "⚠️WARNING: This will REMOVE ALL Docker volumes for the system."
+  @echo "This includes database data and is NOT reversible."
+
+  @printf "Type 'yes' to continue: "
+  @read confirm && [ "$confirm" = "yes" ]
+
+  @echo "Stopping Jaeger..."
+  docker compose -f infrastructure/jaeger/docker-compose.yml down --volumes
+
+  @echo "Stopping Traefik..."
+  docker compose -f infrastructure/traefik/docker-compose.yml down --volumes
+
+  @echo "Stopping services..."
+  docker compose -f services/docker-compose.yml down --volumes
+
+  @echo "Stopping DB..."
+  docker compose -f infrastructure/db/docker-compose.yml down --volumes
+
+  @echo "Undeployment complete!"
+
 # Generate rust protobuf files
 [working-directory: 'services']
 [group: "generate"]
