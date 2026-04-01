@@ -36,7 +36,7 @@ The backend consists of Rust microservices. Client requests always reach the `ga
 
 #### Microservice Structure
 
-Each microservice focuses on simple CRUD operations and uses a straightforward structure. The architecture decouples the database/repository layer from the service logic. If complexity grows, responsibilities can be further split (e.g., add a dedicated service layer for domain logic).
+Each microservice focuses on simple CRUD operations. The architecture decouples the database/repository layer from the service logic. If complexity grows, responsibilities can be further split (e.g., add a dedicated service layer for domain logic).
 
 A typical microservice (see [`dummy`](./services/dummy)) has the following structure:
 - `main.rs` – setup (environment variables, database connection) and service startup
@@ -57,7 +57,7 @@ Microservices need access to the API layer of other microservices—specifically
 1. Compiling protos in a common `proto` library and including it in each microservice, or
 2. Compiling protos as part of each service and exposing them via `lib.rs`
 
-This setup uses the second approach. It avoids introducing a shared `proto` library, and each service can define which parts of the proto to expose. Note: `lib.rs` should only expose what's needed by other services—typically just the full or partial `proto.rs`.
+This setup uses the second approach. It avoids introducing a shared `proto` library, and each service can define which parts of the proto to expose. Note: `lib.rs` should only expose what's needed by other services—typically the full or partial `proto.rs`.
 
 #### Database
 
@@ -85,11 +85,11 @@ All backend microservices are deployed together with Docker Compose.
 
 Currently, binaries are built within the Docker build process. For Rust images this can be slow. Significant effort has gone into optimal caching, but if a central dependency changes, it can still take a while to rebuild all images.
 
-An alternative is building binaries outside Docker and copying them into a minimal image (e.g., `scratch` or `alpine`). This is arguably more scalable—but there's something elegant about building everything within Docker.
+An alternative is building binaries outside Docker and copying them into a minimal image (e.g., `scratch` or `alpine`). This approach might be more scalable, but is not what is chosen for this setup.
 
 ### Authentication
 
-Authentication is hand-rolled using the documentation from [lucia](https://lucia-auth.com/) and implements OAuth login with Google and GitHub.
+Authentication is implemented using the documentation from [lucia](https://lucia-auth.com/) and implements OAuth login with Google and GitHub.
 
 **⚠️Do not use this without audit on production!**
 
@@ -99,7 +99,7 @@ Backend communication uses `gRPC`. Proto files are compiled into both Rust and T
 
 ### Routing
 
-**Traefik** serves as a reverse proxy to route requests to the backend or frontend. Setup is straightforward.
+**Traefik** serves as a reverse proxy to route requests to the backend or frontend.
 
 ### Testing
 
@@ -113,7 +113,7 @@ Database tests use [`testcontainers`](https://docs.rs/testcontainers/latest/test
 
 #### Integration Tests
 
-Integration tests also use `testcontainers` to spin up all required services. These tests live in [`services/gateway/tests`](./services/gateway/tests) and verify interactions between microservices in a realistic environment.
+Integration tests also use `testcontainers` to spin up all required services. These tests live in [`services/gateway/tests`](./services/gateway/tests) and verify interactions between microservices.
 
 ### Tracing
 
