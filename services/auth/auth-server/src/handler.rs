@@ -13,12 +13,12 @@ use std::marker::PhantomData;
 use crate::{
     database::DBClient,
     oauth::{github::GithubOAuth, google::GoogleOAuth},
-    proto::{
-        CreateSessionReq, CreateSessionResp, DeleteSessionReq, DeleteSessionResp,
-        GetOauthAccountReq, GetOauthAccountResp, HandleOauthCallbackReq, HandleOauthCallbackResp,
-        LinkOauthAccountReq, LinkOauthAccountResp, StartOauthLoginReq, StartOauthLoginResp,
-        ValidateSessionReq, ValidateSessionResp, auth_service_server::AuthService,
-    },
+};
+use api::{
+    CreateSessionReq, CreateSessionResp, DeleteSessionReq, DeleteSessionResp, GetOauthAccountReq,
+    GetOauthAccountResp, HandleOauthCallbackReq, HandleOauthCallbackResp, LinkOauthAccountReq,
+    LinkOauthAccountResp, StartOauthLoginReq, StartOauthLoginResp, ValidateSessionReq,
+    ValidateSessionResp, auth_service_server::AuthService,
 };
 use common::{Now, SystemNow};
 use oauth::RandomSource;

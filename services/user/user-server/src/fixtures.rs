@@ -3,7 +3,7 @@
 use uuid::Uuid;
 
 use crate::database::User;
-use api::proto::{self, CreateUserReq, GetUserReq, GetUserResp, NewUser};
+use api::{CreateUserReq, GetUserReq, GetUserResp, NewUser};
 
 pub fn fixture_uuid() -> Uuid {
     Uuid::parse_str("00000000-0000-0000-0000-000000000000").unwrap()
@@ -22,11 +22,11 @@ where
     user
 }
 
-pub fn fixture_proto_user<F>(mut func: F) -> proto::User
+pub fn fixture_proto_user<F>(mut func: F) -> api::User
 where
-    F: FnMut(&mut proto::User),
+    F: FnMut(&mut api::User),
 {
-    let mut user = proto::User {
+    let mut user = api::User {
         id: fixture_uuid().to_string(),
         name: "name".to_string(),
         email: "email".to_string(),

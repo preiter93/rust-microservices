@@ -7,7 +7,7 @@ use uuid::Uuid;
 
 use super::model::{OAuthAccount, Session};
 use crate::error::DBError;
-use crate::proto::OauthProvider;
+use api::OauthProvider;
 
 #[cfg_attr(test, mock::db_client)]
 #[async_trait]

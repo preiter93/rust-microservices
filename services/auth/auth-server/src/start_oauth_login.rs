@@ -1,11 +1,8 @@
 use oauth::{OAuth, OAuthProvider as _, RandomSource};
 use tonic::{Request, Response, Status};
 
-use crate::{
-    error::Error,
-    handler::Handler,
-    proto::{OauthProvider, StartOauthLoginReq, StartOauthLoginResp},
-};
+use crate::{error::Error, handler::Handler};
+use api::{OauthProvider, StartOauthLoginReq, StartOauthLoginResp};
 
 impl<D, R, N> Handler<D, R, N>
 where

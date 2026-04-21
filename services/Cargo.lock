@@ -82,9 +82,30 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1505bd5d3d116872e7271a6d4e16d81d0c8570876c8de68093a09ac269d8aac0"
 
 [[package]]
-name = "auth"
+name = "auth-api"
 version = "0.1.0"
 dependencies = [
+ "prost 0.14.3",
+ "serde",
+ "tonic 0.14.5",
+ "tonic-prost",
+]
+
+[[package]]
+name = "auth-client"
+version = "0.1.0"
+dependencies = [
+ "auth-api",
+ "setup",
+ "tokio",
+ "tonic 0.14.5",
+]
+
+[[package]]
+name = "auth-server"
+version = "0.1.0"
+dependencies = [
+ "auth-api",
  "chrono",
  "common",
  "database",
@@ -93,7 +114,6 @@ dependencies = [
  "dotenv",
  "mock",
  "oauth",
- "prost 0.14.3",
  "refinery",
  "reqwest",
  "rstest",
@@ -105,7 +125,6 @@ dependencies = [
  "tokio",
  "tokio-postgres",
  "tonic 0.14.5",
- "tonic-prost",
  "tracing",
  "uuid",
 ]
@@ -809,7 +828,8 @@ dependencies = [
 name = "gateway"
 version = "0.1.0"
 dependencies = [
- "auth",
+ "auth-api",
+ "auth-client",
  "axum",
  "axum-macros",
  "dtor",
@@ -3366,7 +3386,6 @@ dependencies = [
 name = "user-client"
 version = "0.1.0"
 dependencies = [
- "common",
  "setup",
  "tokio",
  "tonic 0.14.5",

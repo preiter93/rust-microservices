@@ -1,9 +1,5 @@
-use crate::{
-    database::DBClient,
-    error::Error,
-    handler::Handler,
-    proto::{GetOauthAccountReq, GetOauthAccountResp},
-};
+use crate::{database::DBClient, error::Error, handler::Handler};
+use api::{GetOauthAccountReq, GetOauthAccountResp};
 use common::Now;
 use oauth::RandomSource;
 use setup::validate_user_id;
@@ -43,8 +39,8 @@ mod tests {
         fixture::fixture_oauth_account,
         handler::Handler,
         oauth::{github::GithubOAuth, google::GoogleOAuth},
-        proto::{GetOauthAccountReq, GetOauthAccountResp, OauthProvider},
     };
+    use api::{GetOauthAccountReq, GetOauthAccountResp, OauthProvider};
     use common::mock::MockNow;
     use oauth::mock::MockRandom;
     use rstest::rstest;

@@ -2,7 +2,7 @@
 
 use super::client::PostgresDBClient;
 use super::model::{OAuthAccount, Session};
-use auth::SERVICE_NAME;
+use api::SERVICE_NAME;
 use testutils::get_test_db;
 
 pub struct DbTestBuilder {

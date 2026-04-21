@@ -1,9 +1,5 @@
-use crate::{
-    database::DBClient,
-    error::Error,
-    handler::Handler,
-    proto::{LinkOauthAccountReq, LinkOauthAccountResp},
-};
+use crate::{database::DBClient, error::Error, handler::Handler};
+use api::{LinkOauthAccountReq, LinkOauthAccountResp};
 use common::Now;
 use oauth::RandomSource;
 use setup::validate_user_id;

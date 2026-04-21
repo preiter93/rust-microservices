@@ -5,7 +5,7 @@ use uuid::Uuid;
 use super::client::PostgresDBClient;
 use super::model::OAuthAccount;
 use crate::error::DBError;
-use crate::proto::OauthProvider;
+use api::OauthProvider;
 
 impl PostgresDBClient {
     /// Returns the oauth account from a user id and provider.

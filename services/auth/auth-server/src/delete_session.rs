@@ -1,11 +1,7 @@
 use tonic::{Request, Response, Status};
 
-use crate::{
-    database::DBClient,
-    error::Error,
-    handler::Handler,
-    proto::{DeleteSessionReq, DeleteSessionResp},
-};
+use crate::{database::DBClient, error::Error, handler::Handler};
+use api::{DeleteSessionReq, DeleteSessionResp};
 
 impl<D, R, N> Handler<D, R, N>
 where
@@ -62,8 +58,8 @@ mod tests {
         fixture::fixture_token,
         handler::Handler,
         oauth::{github::GithubOAuth, google::GoogleOAuth},
-        proto::{DeleteSessionReq, DeleteSessionResp},
     };
+    use api::{DeleteSessionReq, DeleteSessionResp};
 
     #[rstest]
     #[case::happy_path(

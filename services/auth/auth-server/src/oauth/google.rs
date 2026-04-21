@@ -6,8 +6,8 @@ use tonic::async_trait;
 use crate::{
     database::OAuthAccount,
     oauth::{config::OauthConfig, error::Error, models::OAuth2Token},
-    proto::OauthProvider,
 };
+use api::OauthProvider;
 
 /// Google OAuth 2.0 endpoints.
 const GOOGLE_JWKS_CERTS_ENDPOINT: &str = "https://www.googleapis.com/oauth2/v3/certs";

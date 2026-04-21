@@ -1,10 +1,10 @@
 use crate::error::{ApiError, OAuthError};
 use crate::utils::{OAUTH_CODE_VERIFIER, OAUTH_STATE, OauthCookieJar, parse_provider};
-use auth::client::{AuthClient, IAuthClient};
-use auth::proto::{
+use auth_api::{
     CreateSessionReq, DeleteSessionReq, HandleOauthCallbackReq, LinkOauthAccountReq,
     StartOauthLoginReq,
 };
+use auth_client::{AuthClient, IAuthClient};
 use axum::{
     Extension, Json,
     body::Body,

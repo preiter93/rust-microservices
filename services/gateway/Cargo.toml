@@ -16,7 +16,8 @@ axum-macros = { version = "0.5" }
 serde_json = { version = "1.0" } 
 tower-http = { version = "0.6", features = ["cors"] }
 
-auth = { version = "0.1", path = "../auth" }
+auth-api = { version = "0.1", path = "../auth/auth-api" }
+auth-client = { version = "0.1", path = "../auth/auth-client" }
 user-api = { version = "0.1", path = "../user/user-api" }
 user-client = { version = "0.1", path = "../user/user-client" }
 setup = { version = "0.1", path = "../pkg/setup" }

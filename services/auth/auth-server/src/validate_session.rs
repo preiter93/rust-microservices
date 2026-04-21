@@ -10,9 +10,9 @@ use crate::{
     database::DBClient,
     error::{DBError, Error},
     handler::Handler,
-    proto::{ValidateSessionReq, ValidateSessionResp},
     utils::{constant_time_equal, hash_secret},
 };
+use api::{ValidateSessionReq, ValidateSessionResp};
 use common::Now;
 use oauth::RandomSource;
 use setup::session::SESSION_TOKEN_EXPIRY_DURATION;
@@ -101,8 +101,8 @@ mod tests {
         fixture::{fixture_session, fixture_token, fixture_uuid},
         handler::Handler,
         oauth::{github::GithubOAuth, google::GoogleOAuth},
-        proto::{ValidateSessionReq, ValidateSessionResp},
     };
+    use api::{ValidateSessionReq, ValidateSessionResp};
 
     #[rstest]
     #[case::happy_path(

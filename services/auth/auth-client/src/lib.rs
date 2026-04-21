@@ -1,8 +1,7 @@
-pub mod client;
-pub mod proto;
+mod client;
+pub use client::*;
 
-use crate::client::{AuthClient, IAuthClient};
-use crate::proto::ValidateSessionReq;
+use api::ValidateSessionReq;
 use setup::middleware::SessionAuthClient;
 use setup::{
     middleware::auth::{AuthenticateSessionErr, AuthenticatedSession},

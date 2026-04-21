@@ -119,7 +119,7 @@ async fn run_auth_service(pg_host: &str, pg_port: &str) -> ContainerAsync<Generi
     auth_env_vars.insert("GITHUB_CLIENT_ID", "test");
     auth_env_vars.insert("GITHUB_CLIENT_SECRET", "test");
     auth_env_vars.insert("GITHUB_REDIRECT_URI", "test");
-    let exposed_port = Some(auth::GRPC_PORT);
+    let exposed_port = Some(auth_client::GRPC_PORT);
     run_service_container("auth", pg_host, pg_port, auth_env_vars, exposed_port).await
 }
 

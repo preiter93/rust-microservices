@@ -1,6 +1,8 @@
 [workspace]
 members = [
-    "auth",
+    "auth/auth-api",
+    "auth/auth-client",
+    "auth/auth-server",
     "gateway",
     "user/user-api",
     "user/user-client",

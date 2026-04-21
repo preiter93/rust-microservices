@@ -4,7 +4,6 @@ use tokio_postgres::Row;
 use uuid::Uuid;
 
 use crate::error::{DBError, Error};
-use api::proto;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct User {
@@ -19,7 +18,7 @@ impl User {
     /// # Errors
     /// - `InvalidArgument` if the name is empty
     /// - `InvalidArgument` if the email is empty
-    pub fn from_proto(id: Uuid, new_user: proto::NewUser) -> Result<Self, Error> {
+    pub fn from_proto(id: Uuid, new_user: api::NewUser) -> Result<Self, Error> {
         if new_user.name.is_empty() {
             return Err(Error::MissingUserName);
         }
@@ -36,8 +35,8 @@ impl User {
     }
 
     /// Converts the user to a proto User.
-    pub fn to_proto(self) -> proto::User {
-        proto::User {
+    pub fn to_proto(self) -> api::User {
+        api::User {
             id: self.id.to_string(),
             name: self.name,
             email: self.email,

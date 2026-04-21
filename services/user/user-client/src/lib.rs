@@ -1,4 +1,4 @@
-pub mod client;
+mod client;
 pub use client::*;
 
 pub const GRPC_PORT: u16 = 50051;

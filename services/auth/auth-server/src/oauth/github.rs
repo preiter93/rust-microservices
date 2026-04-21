@@ -13,8 +13,8 @@ use crate::{
     SERVICE_NAME,
     database::OAuthAccount,
     oauth::{config::OauthConfig, error::Error, models::OAuth2Token},
-    proto::OauthProvider,
 };
+use api::OauthProvider;
 
 /// GitHub OAuth 2.0 endpoints.
 const GITHUB_AUTH_ENDPOINT: &str = "https://github.com/login/oauth/authorize";

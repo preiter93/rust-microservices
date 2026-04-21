@@ -1,11 +1,7 @@
 use tonic::{Request, Response, Status};
 
-use crate::{
-    database::DBClient,
-    error::Error,
-    handler::Handler,
-    proto::{HandleOauthCallbackReq, HandleOauthCallbackResp, OauthProvider},
-};
+use crate::{database::DBClient, error::Error, handler::Handler};
+use api::{HandleOauthCallbackReq, HandleOauthCallbackResp, OauthProvider};
 use common::Now;
 use oauth::{OAuthProvider as _, RandomSource};
 

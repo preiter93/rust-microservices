@@ -1,5 +1,5 @@
 [package]
-name = "auth"
+name = "auth-server"
 version = "0.1.0"
 edition = "2024"
 
@@ -8,7 +8,6 @@ chrono = { workspace = true }
 deadpool-postgres = { workspace = true }
 derive-tonic-status = { workspace = true }
 dotenv = { workspace = true }
-prost = { workspace = true }
 refinery = { workspace = true }
 reqwest = { workspace = true }
 serde = { workspace = true }
@@ -16,23 +15,23 @@ thiserror = { workspace = true }
 tokio = { workspace = true }
 tokio-postgres = { workspace = true }
 tonic = { workspace = true }
-tonic-prost = { workspace = true }
 tracing = {workspace = true }
 uuid = { workspace = true }
 
 sha2 = { version = "0.10.5" }
 
-common = { version = "0.1", path = "../pkg/common" }
-database = { version = "0.1", path = "../pkg/database" }
-setup = { version = "0.1", path = "../pkg/setup" }
-oauth = { version = "0.1", path = "../pkg/oauth" }
+api = { package = "auth-api", version = "0.1", path = "../auth-api" }
+common = { version = "0.1", path = "../../pkg/common" }
+database = { version = "0.1", path = "../../pkg/database" }
+setup = { version = "0.1", path = "../../pkg/setup" }
+oauth = { version = "0.1", path = "../../pkg/oauth" }
 
 [dev-dependencies]
 rstest = { workspace = true }
-testutils = { version = "0.1", path = "../pkg/testutils" }
-common = { version = "0.1", path = "../pkg/common", features = ["mock"] }
-oauth = { version = "0.1", path = "../pkg/oauth", features = ["mock"] }
-mock = { version = "0.1", path = "../pkg/mock" }
+testutils = { version = "0.1", path = "../../pkg/testutils" }
+common = { version = "0.1", path = "../../pkg/common", features = ["mock"] }
+oauth = { version = "0.1", path = "../../pkg/oauth", features = ["mock"] }
+mock = { version = "0.1", path = "../../pkg/mock" }
 
 [features]
 default = ["testutils"]

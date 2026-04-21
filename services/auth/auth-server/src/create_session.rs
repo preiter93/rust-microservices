@@ -2,9 +2,9 @@ use crate::{
     database::{DBClient, Session},
     error::Error,
     handler::{Handler, SessionToken},
-    proto::{CreateSessionReq, CreateSessionResp},
     utils::hash_secret,
 };
+use api::{CreateSessionReq, CreateSessionResp};
 use common::Now;
 use oauth::RandomSource;
 use setup::validate_user_id;

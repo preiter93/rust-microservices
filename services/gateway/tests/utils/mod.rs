@@ -2,7 +2,7 @@ pub mod testcontainers;
 
 use std::{error::Error, str::FromStr};
 
-use auth::proto::{CreateSessionReq, auth_service_client::AuthServiceClient as AuthClient};
+use auth_api::{CreateSessionReq, auth_service_client::AuthServiceClient as AuthClient};
 use axum::http::{HeaderMap, HeaderValue};
 use reqwest::header::COOKIE;
 use tonic::{Request, transport::Endpoint};
@@ -35,7 +35,10 @@ pub(crate) async fn create_authenticated_user(
 ) -> Result<AuthenticatedUser, Box<dyn Error>> {
     let host = containers.user.get_host().await.unwrap();
 
-    let port = containers.auth.get_host_port_ipv4(auth::GRPC_PORT).await;
+    let port = containers
+        .auth
+        .get_host_port_ipv4(auth_client::GRPC_PORT)
+        .await;
     let endpoint = Endpoint::from_str(&format!("http://{host}:{}", port.unwrap()))?;
     let channel = endpoint.connect().await?;
     let mut auth_client = AuthClient::new(channel);

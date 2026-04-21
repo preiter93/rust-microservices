@@ -1,5 +1,5 @@
 [package]
-name = "user-client"
+name = "auth-client"
 version = "0.1.0"
 edition = "2024"
 
@@ -7,7 +7,7 @@ edition = "2024"
 tokio = { workspace = true }
 tonic = { workspace = true }
 
-api = { package = "user-api", version = "0.1", path = "../user-api" }
+api = { package = "auth-api", version = "0.1", path = "../auth-api" }
 setup = { version = "0.1", path = "../../pkg/setup" }
 
 [features]
