@@ -21,8 +21,8 @@ use setup::cookie::{
 use setup::session::SessionState;
 use tonic::{Code, Request, Status};
 use tracing::instrument;
-use user::client::{IUserClient, UserClient};
-use user::proto::{CreateUserReq, GetUserReq, GetUserResp, NewUser};
+use user_api::{CreateUserReq, GetUserReq, GetUserResp, NewUser};
+use user_client::{IUserClient, UserClient};
 
 #[derive(Clone)]
 pub(crate) struct Handler {
@@ -151,7 +151,9 @@ pub async fn handle_oauth_callback(
 
     let mut user_id = callback_data.user_id;
     if user_id.is_empty() {
-        let req = Request::new(CreateUserReq { user: Some(NewUser { name, email }) });
+        let req = Request::new(CreateUserReq {
+            user: Some(NewUser { name, email }),
+        });
         let resp = h.user_client.create_user(req).await?;
         let user = resp.into_inner().user.ok_or_else(|| {
             OAuthError::RequestError(Status::new(Code::Internal, "failed to create user"))

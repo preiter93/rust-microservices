@@ -1,0 +1,16 @@
+[package]
+name = "user-client"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tokio = { workspace = true }
+tonic = { workspace = true }
+
+common = { version = "0.1", path = "../../pkg/common" }
+api = { package = "user-api", version = "0.1", path = "../user-api" }
+setup = { version = "0.1", path = "../../pkg/setup" }
+
+[features]
+default = ["testutils"]
+testutils = []

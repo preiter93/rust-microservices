@@ -2,8 +2,8 @@
 
 use super::client::PostgresDBClient;
 use super::model::User;
+use api::SERVICE_NAME;
 use testutils::get_test_db;
-use user::SERVICE_NAME;
 
 pub struct DbTestBuilder {
     users: Vec<User>,

@@ -28,7 +28,7 @@ impl PostgresDBClient {
 #[cfg(test)]
 mod tests {
     use crate::database::test_helpers::run_db_test;
-    use crate::fixture::fixture_user;
+    use crate::fixtures::fixture_user;
     use uuid::Uuid;
 
     #[tokio::test]

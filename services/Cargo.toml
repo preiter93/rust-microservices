@@ -2,7 +2,9 @@
 members = [
     "auth",
     "gateway",
-    "user",
+    "user/user-api",
+    "user/user-client",
+    "user/user-server",
     "dummy",
     "pkg/common",
     "pkg/database",

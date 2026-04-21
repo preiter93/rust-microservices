@@ -124,7 +124,7 @@ async fn run_auth_service(pg_host: &str, pg_port: &str) -> ContainerAsync<Generi
 }
 
 async fn run_user_service(pg_host: &str, pg_port: &str) -> ContainerAsync<GenericImage> {
-    let exposed_port = Some(user::GRPC_PORT);
+    let exposed_port = Some(user_client::GRPC_PORT);
     run_service_container("user", pg_host, pg_port, HashMap::new(), exposed_port).await
 }
 

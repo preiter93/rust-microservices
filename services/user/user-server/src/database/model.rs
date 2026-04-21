@@ -4,7 +4,7 @@ use tokio_postgres::Row;
 use uuid::Uuid;
 
 use crate::error::{DBError, Error};
-use crate::proto;
+use api::proto;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct User {

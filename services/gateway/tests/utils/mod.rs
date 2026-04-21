@@ -6,7 +6,7 @@ use auth::proto::{CreateSessionReq, auth_service_client::AuthServiceClient as Au
 use axum::http::{HeaderMap, HeaderValue};
 use reqwest::header::COOKIE;
 use tonic::{Request, transport::Endpoint};
-use user::proto::{
+use user_api::{
     CreateUserReq, NewUser, User, user_service_client::UserServiceClient as UserClient,
 };
 
@@ -40,7 +40,10 @@ pub(crate) async fn create_authenticated_user(
     let channel = endpoint.connect().await?;
     let mut auth_client = AuthClient::new(channel);
 
-    let port = containers.user.get_host_port_ipv4(user::GRPC_PORT).await;
+    let port = containers
+        .user
+        .get_host_port_ipv4(user_client::GRPC_PORT)
+        .await;
     let endpoint = Endpoint::from_str(&format!("http://{host}:{}", port.unwrap()))?;
     let channel = endpoint.connect().await?;
     let mut user_client = UserClient::new(channel);

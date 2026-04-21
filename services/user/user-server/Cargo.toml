@@ -1,34 +1,32 @@
 [package]
-name = "user"
+name = "user-server"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-chrono = { workspace = true }
 deadpool-postgres = { workspace = true }
 derive-tonic-status = { workspace = true }
 dotenv = { workspace = true }
-prost = { workspace = true }
 refinery = { workspace = true }
 serde = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
 tokio-postgres = { workspace = true }
 tonic = { workspace = true }
-tonic-prost = { workspace = true }
 uuid = { workspace = true }
 tracing = {workspace = true }
 
-common = { version = "0.1", path = "../pkg/common" }
-database = { version = "0.1", path = "../pkg/database" }
-setup = { version = "0.1", path = "../pkg/setup" }
+api = { package = "user-api", version = "0.1", path = "../user-api" }
+common = { version = "0.1", path = "../../pkg/common" }
+database = { version = "0.1", path = "../../pkg/database" }
+setup = { version = "0.1", path = "../../pkg/setup" }
 
 [dev-dependencies]
 rstest = { workspace = true }
 
-common = { version = "0.1", path = "../pkg/common", features = ["mock"] }
-testutils = { version = "0.1", path = "../pkg/testutils" }
-mock = { version = "0.1", path = "../pkg/mock" }
+common = { version = "0.1", path = "../../pkg/common", features = ["mock"] }
+testutils = { version = "0.1", path = "../../pkg/testutils" }
+mock = { version = "0.1", path = "../../pkg/mock" }
 
 [features]
 default = ["testutils"]

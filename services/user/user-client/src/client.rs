@@ -1,11 +1,11 @@
 // This file is generated.
 use crate::GRPC_PORT;
 use crate::SERVICE_NAME;
-use crate::proto::CreateUserReq;
-use crate::proto::CreateUserResp;
-use crate::proto::GetUserReq;
-use crate::proto::GetUserResp;
-use crate::proto::user_service_client::UserServiceClient;
+use api::proto::CreateUserReq;
+use api::proto::CreateUserResp;
+use api::proto::GetUserReq;
+use api::proto::GetUserResp;
+use api::proto::user_service_client::UserServiceClient;
 use setup::{middleware::tracing::TracingServiceClient, patched_host};
 use std::{error::Error, str::FromStr as _};
 use tonic::transport::{Channel, Endpoint};

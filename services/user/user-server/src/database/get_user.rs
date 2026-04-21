@@ -33,7 +33,7 @@ impl PostgresDBClient {
 mod tests {
     use super::*;
     use crate::database::test_helpers::DbTestBuilder;
-    use crate::fixture::{fixture_user, fixture_uuid};
+    use crate::fixtures::{fixture_user, fixture_uuid};
     use rstest::rstest;
 
     #[rstest]

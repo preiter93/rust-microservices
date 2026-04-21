@@ -3,7 +3,7 @@
 use uuid::Uuid;
 
 use crate::database::User;
-use crate::proto::{self, CreateUserReq, GetUserReq, GetUserResp, NewUser};
+use api::proto::{self, CreateUserReq, GetUserReq, GetUserResp, NewUser};
 
 pub fn fixture_uuid() -> Uuid {
     Uuid::parse_str("00000000-0000-0000-0000-000000000000").unwrap()

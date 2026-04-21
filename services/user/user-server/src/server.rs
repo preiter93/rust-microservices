@@ -1,21 +1,19 @@
-use crate::{
-    database::DBClient,
-    proto::{
-        CreateUserReq, CreateUserResp, GetUserReq, GetUserResp, user_service_server::UserService,
-    },
+use crate::database::DBClient;
+use api::{
+    CreateUserReq, CreateUserResp, GetUserReq, GetUserResp, user_service_server::UserService,
 };
 use common::UuidGenerator;
 use tonic::{Request, Response, Status};
 use tracing::instrument;
 
 #[derive(Clone)]
-pub struct Handler<D, U> {
+pub struct Server<D, U> {
     pub db: D,
     pub uuid: U,
 }
 
 #[tonic::async_trait]
-impl<D, U> UserService for Handler<D, U>
+impl<D, U> UserService for Server<D, U>
 where
     D: DBClient,
     U: UuidGenerator,
