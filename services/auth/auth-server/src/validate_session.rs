@@ -98,7 +98,7 @@ mod tests {
     use crate::{
         database::{MockDBClient, Session},
         error::DBError,
-        fixture::{fixture_session, fixture_token, fixture_uuid},
+        fixtures::{fixture_session, fixture_token, fixture_uuid},
         handler::Handler,
         oauth::{github::GithubOAuth, google::GoogleOAuth},
     };

@@ -1,11 +1,8 @@
 use crate::error::{DBError, Error};
 use crate::utils::validate_entity_id;
 
-use crate::{
-    database::DBClient,
-    handler::Handler,
-    proto::{GetEntityReq, GetEntityResp},
-};
+use crate::{database::DBClient, handler::Handler};
+use api::{GetEntityReq, GetEntityResp};
 use common::UuidGenerator;
 use setup::validate_user_id;
 use tonic::{Request, Response, Status};
@@ -51,10 +48,10 @@ mod tests {
     use crate::{
         database::{Entity, MockDBClient},
         error::DBError,
-        fixture::{fixture_entity, fixture_get_entity_req, fixture_get_entity_resp},
+        fixtures::{fixture_entity, fixture_get_entity_req, fixture_get_entity_resp},
         handler::Handler,
-        proto::{GetEntityReq, GetEntityResp},
     };
+    use api::{GetEntityReq, GetEntityResp};
 
     #[rstest]
     #[case::happy_path(

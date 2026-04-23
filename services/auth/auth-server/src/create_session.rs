@@ -58,7 +58,7 @@ mod tests {
     use super::*;
     use crate::database::MockDBClient;
     use crate::error::DBError;
-    use crate::fixture::{fixture_token, fixture_uuid};
+    use crate::fixtures::{fixture_token, fixture_uuid};
     use crate::oauth::{github::GithubOAuth, google::GoogleOAuth};
     use common::mock::MockNow;
     use oauth::mock::MockRandom;

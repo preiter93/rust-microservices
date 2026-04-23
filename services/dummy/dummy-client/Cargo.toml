@@ -1,0 +1,15 @@
+[package]
+name = "dummy-client"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tokio = { workspace = true }
+tonic = { workspace = true }
+
+api = { package = "dummy-api", version = "0.1", path = "../dummy-api" }
+setup = { version = "0.1", path = "../../pkg/setup" }
+
+[features]
+default = ["testutils"]
+testutils = []

@@ -4,17 +4,17 @@ pub mod error;
 pub mod get_entity;
 pub mod handler;
 #[allow(clippy::all)]
-pub mod proto;
 pub mod utils;
 
 #[cfg(test)]
-mod fixture;
+mod fixtures;
 
-use crate::{handler::Handler, proto::dummy_service_server::DummyServiceServer};
+use crate::handler::Handler;
+use api::dummy_service_server::DummyServiceServer;
+use api::{GRPC_PORT, SERVICE_NAME};
 use common::UuidV4Generator;
 use database::PostgresDBClient;
 use dotenv::dotenv;
-use dummy::{GRPC_PORT, SERVICE_NAME};
 use setup::{middleware::TracingGrpcServiceLayer, tracing::init_tracer};
 use std::error::Error;
 

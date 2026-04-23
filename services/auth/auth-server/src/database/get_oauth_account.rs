@@ -39,7 +39,7 @@ mod tests {
     use super::*;
     use crate::database::test_helpers::DbTestBuilder;
     use crate::error::DBError;
-    use crate::fixture::fixture_oauth_account;
+    use crate::fixtures::fixture_oauth_account;
     use rstest::rstest;
 
     #[rstest]

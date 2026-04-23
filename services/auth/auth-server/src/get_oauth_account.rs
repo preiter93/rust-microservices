@@ -36,7 +36,7 @@ mod tests {
     use crate::{
         database::{MockDBClient, OAuthAccount},
         error::DBError,
-        fixture::fixture_oauth_account,
+        fixtures::fixture_oauth_account,
         handler::Handler,
         oauth::{github::GithubOAuth, google::GoogleOAuth},
     };

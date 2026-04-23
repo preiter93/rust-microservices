@@ -4,7 +4,6 @@ use tokio_postgres::Row;
 use uuid::Uuid;
 
 use crate::error::{DBError, Error};
-use crate::proto;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Entity {
@@ -18,11 +17,7 @@ impl Entity {
     ///
     /// # Errors
     /// - `InvalidArgument` if the name is empty
-    pub fn from_proto(
-        id: Uuid,
-        user_id: Uuid,
-        new_entity: proto::NewEntity,
-    ) -> Result<Self, Error> {
+    pub fn from_proto(id: Uuid, user_id: Uuid, new_entity: api::NewEntity) -> Result<Self, Error> {
         if new_entity.name.is_empty() {
             return Err(Error::MissingEntityName);
         }
@@ -35,8 +30,8 @@ impl Entity {
     }
 
     /// Converts the entity to a proto Entity.
-    pub fn to_proto(self) -> proto::Entity {
-        proto::Entity {
+    pub fn to_proto(self) -> api::Entity {
+        api::Entity {
             id: self.id.to_string(),
             name: self.name,
         }

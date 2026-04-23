@@ -1,4 +1,3 @@
-# TODO: Run integration tests
 name: Continuous Integration - Services
 
 on:
@@ -18,9 +17,9 @@ jobs:
       matrix:
         # TODO: Discover services
         service:
-          - auth
-          - user
-          - dummy
+          - auth-server
+          - user-server
+          - dummy-server
 
     steps:
     - name: Checkout

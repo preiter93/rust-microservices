@@ -622,17 +622,36 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f678cf4a922c215c63e0de95eb1ff08a958a81d47e485cf9da1e27bf6305cfa5"
 
 [[package]]
-name = "dummy"
+name = "dummy-api"
 version = "0.1.0"
 dependencies = [
- "chrono",
+ "prost 0.14.3",
+ "serde",
+ "tonic 0.14.5",
+ "tonic-prost",
+]
+
+[[package]]
+name = "dummy-client"
+version = "0.1.0"
+dependencies = [
+ "dummy-api",
+ "setup",
+ "tokio",
+ "tonic 0.14.5",
+]
+
+[[package]]
+name = "dummy-server"
+version = "0.1.0"
+dependencies = [
  "common",
  "database",
  "deadpool-postgres",
  "derive-tonic-status",
  "dotenv",
+ "dummy-api",
  "mock",
- "prost 0.14.3",
  "refinery",
  "rstest",
  "serde",
@@ -642,7 +661,6 @@ dependencies = [
  "tokio",
  "tokio-postgres",
  "tonic 0.14.5",
- "tonic-prost",
  "tracing",
  "uuid",
 ]

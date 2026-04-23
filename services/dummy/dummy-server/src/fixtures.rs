@@ -3,7 +3,7 @@
 use uuid::Uuid;
 
 use crate::database::Entity;
-use crate::proto::{self, CreateEntityReq, GetEntityReq, GetEntityResp, NewEntity};
+use api::{self, CreateEntityReq, GetEntityReq, GetEntityResp, NewEntity};
 
 pub fn fixture_uuid() -> Uuid {
     Uuid::parse_str("00000000-0000-0000-0000-000000000000").unwrap()
@@ -22,11 +22,11 @@ where
     entity
 }
 
-pub fn fixture_proto_entity<F>(mut func: F) -> proto::Entity
+pub fn fixture_proto_entity<F>(mut func: F) -> api::Entity
 where
-    F: FnMut(&mut proto::Entity),
+    F: FnMut(&mut api::Entity),
 {
-    let mut entity = proto::Entity {
+    let mut entity = api::Entity {
         id: fixture_uuid().to_string(),
         name: "Test Entity".to_string(),
     };

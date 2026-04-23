@@ -2,8 +2,8 @@ use crate::{
     database::{DBClient, Entity},
     error::Error,
     handler::Handler,
-    proto::{CreateEntityReq, CreateEntityResp},
 };
+use api::{CreateEntityReq, CreateEntityResp};
 use common::UuidGenerator;
 use setup::validate_user_id;
 use tonic::{Request, Response, Status};
@@ -49,10 +49,10 @@ mod tests {
     use crate::{
         database::MockDBClient,
         error::DBError,
-        fixture::{fixture_create_entity_req, fixture_proto_entity},
+        fixtures::{fixture_create_entity_req, fixture_proto_entity},
         handler::Handler,
-        proto::{CreateEntityReq, CreateEntityResp},
     };
+    use api::{CreateEntityReq, CreateEntityResp};
     use common::mock::MockUuidGenerator;
     use rstest::rstest;
     use tokio::sync::Mutex;

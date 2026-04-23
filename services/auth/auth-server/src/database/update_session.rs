@@ -32,7 +32,7 @@ impl PostgresDBClient {
 #[cfg(test)]
 mod tests {
     use crate::database::test_helpers::DbTestBuilder;
-    use crate::fixture::fixture_session;
+    use crate::fixtures::fixture_session;
     use chrono::TimeZone;
 
     #[tokio::test]

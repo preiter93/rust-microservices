@@ -24,7 +24,7 @@ impl PostgresDBClient {
 mod tests {
     use super::*;
     use crate::database::test_helpers::DbTestBuilder;
-    use crate::fixture::fixture_session;
+    use crate::fixtures::fixture_session;
 
     #[tokio::test]
     async fn test_delete_session() {

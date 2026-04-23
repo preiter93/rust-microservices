@@ -1,0 +1,14 @@
+[package]
+name = "dummy-api"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+prost = { workspace = true }
+serde = { workspace = true }
+tonic = { workspace = true }
+tonic-prost = { workspace = true }
+
+[features]
+default = ["testutils"]
+testutils = []

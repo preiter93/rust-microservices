@@ -2,7 +2,7 @@
 // versions:
 //   protoc-gen-ts_proto  v2.11.6
 //   protoc               unknown
-// source: dummy/api.proto
+// source: dummy/dummy-api/api.proto
 
 /* eslint-disable */
 

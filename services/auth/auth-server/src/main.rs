@@ -14,7 +14,7 @@ pub(crate) mod utils;
 pub(crate) mod validate_session;
 
 #[cfg(test)]
-mod fixture;
+mod fixtures;
 
 use crate::{
     database::PostgresDBClient,

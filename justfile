@@ -97,11 +97,9 @@ nuke:
 generate-protos-rs:
   #!/usr/bin/env sh
   set -e
-  for d in */; do
-    if [ -f "$d"/justfile ] && [ -n "$(find "$d" -name '*.proto' -print -quit)" ]; then
-      echo "🧬 Generating protos in $d"
-      just -f "$d"/justfile generate-protos
-    fi
+  for d in $(find . -name "api.proto" -exec dirname {} +); do \
+    echo "🧬 Generating protos in $d"; \
+    (cd "$d" && just generate-protos); \
   done
 
 # Generate Dockerfiles for all services
@@ -110,11 +108,9 @@ generate-protos-rs:
 generate-dockerfile:
   #!/usr/bin/env sh
   set -e
-  for d in */; do
-    if [ -f "$d"/justfile ] && [ "$d" != "pkg/" ]; then
-      echo "🐳 Generating dockerfiles in $d"
-      just -f "$d"/justfile generate-dockerfile
-    fi
+  for d in $(find . -name "main.rs" -exec dirname {} + | xargs -I {} dirname {}); do \
+    echo "🐳 Generating dockerfile in $d"; \
+    (cd "$d" && just generate-dockerfile); \
   done
 
 # Generate typescript protobuf files

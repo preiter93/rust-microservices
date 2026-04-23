@@ -16,17 +16,14 @@ RUN cargo build --release
 
 # Stage 4: Build the actual binary with real source code
 FROM deps AS builder
-RUN rm -rf auth pkg/common pkg/database pkg/oauth pkg/setup pkg/mock pkg/testutils gateway user
-COPY auth auth
-COPY pkg/common pkg/common
-COPY pkg/database pkg/database
-COPY pkg/oauth pkg/oauth
+RUN rm -rf auth/auth-api auth/auth-client pkg/setup gateway user/user-api user/user-client
+COPY auth/auth-api auth/auth-api
+COPY auth/auth-client auth/auth-client
 COPY pkg/setup pkg/setup
-COPY pkg/mock pkg/mock
-COPY pkg/testutils pkg/testutils
 COPY gateway gateway
-COPY user user
-RUN cargo clean --release -p auth -p common -p database -p oauth -p setup -p mock -p testutils -p gateway -p user
+COPY user/user-api user/user-api
+COPY user/user-client user/user-client
+RUN cargo clean --release -p auth-api -p auth-client -p setup -p gateway -p user-api -p user-client
 RUN cargo build --release --bin gateway
 
 # Stage 5: Minimal runtime image

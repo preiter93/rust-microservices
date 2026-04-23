@@ -44,7 +44,7 @@ impl PostgresDBClient {
 #[cfg(test)]
 mod tests {
     use crate::database::test_helpers::DbTestBuilder;
-    use crate::fixture::{fixture_oauth_account, fixture_uuid};
+    use crate::fixtures::{fixture_oauth_account, fixture_uuid};
 
     #[tokio::test]
     async fn test_update_oauth_account() {

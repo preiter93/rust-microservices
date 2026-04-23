@@ -1,9 +1,7 @@
-use crate::{
-    database::DBClient,
-    proto::{
-        CreateEntityReq, CreateEntityResp, GetEntityReq, GetEntityResp,
-        dummy_service_server::DummyService,
-    },
+use crate::database::DBClient;
+use api::{
+    CreateEntityReq, CreateEntityResp, GetEntityReq, GetEntityResp,
+    dummy_service_server::DummyService,
 };
 use common::UuidGenerator;
 use tonic::{Request, Response, Status};

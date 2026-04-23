@@ -32,7 +32,7 @@ impl PostgresDBClient {
 mod tests {
     use crate::database::test_helpers::DbTestBuilder;
     use crate::error::DBError;
-    use crate::fixture::fixture_session;
+    use crate::fixtures::fixture_session;
 
     #[tokio::test]
     async fn test_get_session() {

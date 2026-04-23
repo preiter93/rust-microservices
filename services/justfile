@@ -1,0 +1,20 @@
+set dotenv-load
+
+PROTO_GEN_RS_BINARY := "../../../tools/proto-gen-rs/proto-gen-rs"
+DOCKER_GEN_BINARY := "../../../tools/docker-gen/docker-gen"
+
+generate-protos:
+  @{{PROTO_GEN_RS_BINARY}}
+
+generate-dockerfile:
+  @{{DOCKER_GEN_BINARY}}
+
+generate: generate-protos generate-dockerfile
+
+create:
+    psql -h localhost -U postgres -w -c "CREATE DATABASE user_db;"
+    psql -h localhost -U postgres -w -c "CREATE DATABASE auth_db;"
+
+drop:
+    psql -h localhost -U postgres -w -c "DROP DATABASE IF EXISTS user_db;"
+    psql -h localhost -U postgres -w -c "DROP DATABASE IF EXISTS auth_db;"

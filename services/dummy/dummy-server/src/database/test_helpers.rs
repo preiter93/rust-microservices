@@ -2,7 +2,7 @@
 
 use super::client::PostgresDBClient;
 use super::model::Entity;
-use dummy::SERVICE_NAME;
+use api::SERVICE_NAME;
 use testutils::get_test_db;
 
 pub struct DbTestBuilder {

@@ -1,11 +1,11 @@
 // This file is generated.
 use crate::GRPC_PORT;
 use crate::SERVICE_NAME;
-use crate::proto::CreateEntityReq;
-use crate::proto::CreateEntityResp;
-use crate::proto::GetEntityReq;
-use crate::proto::GetEntityResp;
-use crate::proto::dummy_service_client::DummyServiceClient;
+use api::CreateEntityReq;
+use api::CreateEntityResp;
+use api::GetEntityReq;
+use api::GetEntityResp;
+use api::dummy_service_client::DummyServiceClient;
 use setup::{middleware::tracing::TracingServiceClient, patched_host};
 use std::{error::Error, str::FromStr as _};
 use tonic::transport::{Channel, Endpoint};
